@@ -1,6 +1,6 @@
 ---
 name: imboss
-description: 我是老板——用开会的方式把项目聊清楚。需求、架构、决策，一件事一件事聊透；长期目标用 plan 控盘，plan 先列执行条目，真正开工时再创建 .boss/tasks/.../task.md。
+description: 我是老板——用开会的方式把项目聊清楚。需求、架构、决策，一件事一件事聊透；长期目标用 plan 控盘，plan 先列执行条目，真正开工时再创建 .boss/tasks/.../task.md；也支持用 .ai/ff.yaml stop hook 给 Codex/Claude/OpenCode 做防早停续航。
 ---
 
 # imboss
@@ -33,7 +33,7 @@ description: 我是老板——用开会的方式把项目聊清楚。需求、�
 
 老板让你执行、继续推进，或本轮指令进入路径 E，就表示已经授权开工。
 
-不要假设 Agent CLI 天然知道自己是否由 MC Core 拉起；它只看得到本轮 prompt 和 skill。需要常驻推进时，启动 prompt 必须把“本轮是持续执行、已授权推进”的语义写清楚。
+不要假设 Agent CLI 天然知道自己是否处在持续推进模式；它只看得到本轮 prompt、skill 和项目文件。需要持续推进时，本轮 prompt 或 `.ai/ff.yaml` 必须把“本轮是持续执行、已授权推进”的语义写清楚。
 
 不要在执行轮次里只汇报状态然后问“是否开工”“要不要继续”。默认动作是自己选择下一个安全、可验证、需求锚定的 plan 条目，创建必要 task 文档，执行、验证并更新文档。只有老板明确要求暂停/停下/只汇报，或没有任何安全可做的事，才停下来。
 
@@ -126,25 +126,17 @@ AI 发现模式反复出现、现有指令覆盖不到，主动提议更新技�
 
 **抛球，看老板接不接**——不关心的给默认方案，有判断力的抛选项，深度参与的完整展开。看老板回应调整，也可直接表态。
 
-## MC 工具套件
+## Stop Hook 续航闸门
 
-`tools/` 下有四个 Python 工具，用于持续推进 plans——MC Core 常驻运行，每轮自动拉起 Agent CLI 按 plan 推进，写运行记录。
+当老板提到 stop hook、`.ai/ff.yaml`、让 Codex/Claude/OpenCode 不要太早停，或要给路径 E 加最后一道“继续做完再停”的闸门时，读 [`references/stop-hooks.md`](references/stop-hooks.md)。
+
+快速安装三家 stop hook：
 
 ```bash
-# 启动 MC Core，每轮自动加载 imboss；具体工作指令由启动 prompt 明确给出
-python tools/mc-cli.py start --provider claude --skill imboss --prompt "按 imboss 路径 E 持续执行当前 active plan；本轮指令已授权推进，禁止只汇报状态后询问是否开工或要不要继续。每轮重新读取 .boss/plans/INDEX.md、唯一 active plan、相关 requirements、architecture、.boss/tasks/INDEX.md 和 path-e-guardrails.md；根据当前文档状态选择下一个最小可验证 plan 条目。若该条目还没有 task 文档，先创建 .boss/tasks/.../task.md 并更新 plan/tasks 索引；然后执行、验证并更新文档。plan 只维护条目、task 链接、顺序和状态摘要；不要依赖启动时的旧进度快照。"
-
-# 自定义推进提示词
-python tools/mc-cli.py start --provider claude --skill imboss --prompt "按 imboss 路径 E 持续推进当前唯一 active plan；每轮自行判断当前阶段和下一个 plan 条目，真正开工时再创建 task 文档，不能在规划阶段批量预建 tasks。"
-
-# 查看 / 暂停 / 继续 / 停止
-python tools/mc-cli.py status
-python tools/mc-cli.py pause
-python tools/mc-cli.py resume
-python tools/mc-cli.py stop
+node tools/install-ff-stop-hooks.mjs
 ```
 
-详见 [`tools.md`](tools.md)。
+项目级开关模板在 [`assets/stop-hooks/ff.yaml`](assets/stop-hooks/ff.yaml)。不要把长期计划或进度快照塞进 hook prompt；hook 只放最终检查/继续规则，长期状态仍以 `.boss/` 文档为准。
 
 ## 文件模板
 

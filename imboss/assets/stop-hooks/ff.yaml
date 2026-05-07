@@ -1,0 +1,5 @@
+enabled: true
+prompt: |
+  Before stopping, reread the active imboss plan/task state.
+  If there is a safe, verifiable, requirement-anchored next action, continue with it.
+  If current work is complete, run the relevant verification and update task/plan records before reporting done.

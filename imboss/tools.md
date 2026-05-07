@@ -1,127 +1,13 @@
-# MC 工具套件
+# 工具
 
-四个 Python 工具，用于持续推进 plans。位于 `tools/` 下，免安装，直接跑。
+`tools/` 只保留当前技能需要的确定性辅助工具。详细背景放在对应 reference，入口文档只保留怎么用。
 
-## mc-core.py
+## install-ff-stop-hooks.mjs
 
-Mission Control 核心进程。持续启动 Agent CLI，每轮执行一个任务，写运行记录，根据指令暂停/继续/停止。
-
-```
-python tools/mc-core.py \
-  --provider claude \
-  --skill imboss \
-  --prompt "读取 .boss/plans/INDEX.md，定位唯一 active plan，完成当前阶段下一个未完成任务" \
-  --interval 5
-```
-
-| 参数 | 说明 |
-|------|------|
-| `--root` | 任务目录，默认 `.boss/` |
-| `--provider` | Agent CLI：codex / claude / opencode / gemini |
-| `--prompt "..."` | Agent CLI 的工作指令；必须显式提供，MC Core 没有默认提示词 |
-| `--prompt-file p.md` | 从文件读取 Agent CLI 的工作指令 |
-| `--skill NAME` | 每个回合启动前加载指定 skill（如 imboss） |
-| `--command ...` | 完全自定义启动命令，`{prompt}` 会被替换 |
-| `--interval N` | 每轮间隔秒数，默认 5 |
-| `--max-rounds N` | 最多跑 N 轮后自动停 |
-| `--cwd DIR` | Agent CLI 的工作目录 |
-| `--dry-run` | 打印拼接好的命令，不实际启动 |
-| `--start-paused` | 启动后暂停，等 `resume` 命令 |
-
-MC Core 不承担默认提示词、计划解析或项目上下文拼装职责。它只负责进程生命周期；工作指令必须在启动时通过 `--prompt` 或 `--prompt-file` 显式提供。需要读取 plans、requirements、architecture、tasks 的规则，由启动 prompt 或被加载的 skill 自己规定。
-
-## mc-cli.py
-
-MC Core 的 CLI 控制器。对运行中的 core 发指令，或启动新 core。
+把 `.ai/ff.yaml` stop hook 续航闸门安装到 Codex、Claude Code、OpenCode。详细规则见 [`references/stop-hooks.md`](references/stop-hooks.md)。
 
 ```bash
-# 启动 MC Core（后台常驻，每轮自动启动 Agent CLI 推进 plan）
-python tools/mc-cli.py start --provider claude --skill imboss --prompt "读取 .boss/plans/INDEX.md，定位唯一 active plan，完成当前阶段下一个未完成任务"
-
-# 自定义推进提示词
-python tools/mc-cli.py start --provider claude --skill imboss --prompt "读取 .boss/plans/INDEX.md，定位唯一 active plan，完成当前阶段下一个未完成任务"
-
-# 干跑看拼接结果
-python tools/mc-cli.py start --provider claude --skill imboss --prompt "读取 .boss/plans/INDEX.md，定位唯一 active plan，完成当前阶段下一个未完成任务" --dry-run
-
-# 查看状态
-python tools/mc-cli.py status
-python tools/mc-cli.py status --json
-
-# 查看日志
-python tools/mc-cli.py logs --lines 50
-python tools/mc-cli.py logs --follow
-
-# 发送控制指令
-python tools/mc-cli.py pause     # 暂停
-python tools/mc-cli.py resume    # 继续
-python tools/mc-cli.py wake      # 立刻唤醒跑一轮
-python tools/mc-cli.py stop      # 停止
-
-# 打开浮动状态窗
-python tools/mc-cli.py window
-python tools/mc-cli.py window --all   # 显示所有注册的 .boss root
+node tools/install-ff-stop-hooks.mjs
 ```
 
-### 启动时提供工作指令
-
-`--prompt` 或 `--prompt-file` 是必需的。MC Core 没有默认提示词，启动者必须自行规定 Agent 每轮收到的工作指令：
-
-本节是 MC Core 的操作说明，不是路径 E 本身。路径 E 是被拉起的执行者手册；MC Core 如何拼 prompt、如何常驻、如何表达授权语义，都放在这里，不要搬进 `path-e-plan-execution.md`。
-
-常驻执行的 prompt 必须和当前进度解耦。它应该描述“每轮如何重新读取状态、选择下一个动作、更新文档和验证”，而不是写死某个阶段、某个 task 编号或某个临时结论。MC Core 会复用同一 prompt；如果 prompt 里包含进度快照，阶段推进后会反复把 Agent 拉回旧状态。
-
-如果 prompt 涉及 imboss 路径 E，必须明确：planning 只在 plan 里列待执行条目，不批量创建 task 文档；Agent 真正选择某个条目开工时，才创建 `.boss/tasks/.../task.md`，并更新 plan 与 `tasks/INDEX.md`。不要让 Agent 把 task 主体写成 active plan 里的一行 markdown 待办。
-
-Agent CLI 不天然知道自己是否由 MC Core 拉起，它只看得到本轮 prompt 和 skill。路径 E 的常驻 prompt 必须显式写明“本轮是持续执行，已授权推进”，并禁止 Agent 只汇报状态后询问“是否开工”“要不要继续”；Agent 每轮都应选择一个安全、可验证、需求锚定的动作并推进。
-
-路径 E 的常驻 prompt 还必须说明：每个小 task 完成并验证通过后，如果工作区是 git 仓库，要提交一次只包含本 task 相关改动的小 commit；不能安全提交时，把跳过原因写进 task 记录。
-
-创建或推进 active plan 时，prompt 必须要求当前/最新阶段先列出 planned 条目，不能只写阶段标题或“待拆任务”。条目用于让下一轮 Agent 直接开工；task 文档仍然只在真正开工时创建。
-
-```bash
-# 示例 1：只做 code review
-python tools/mc-cli.py start \
-  --provider claude \
-  --prompt "读取 .boss/plans/INDEX.md 和唯一 active plan，对当前未 review 的改动逐文件 review；active plan 超过 200 行则先压缩"
-
-# 示例 2：按 plan 逐个消灭任务
-python tools/mc-cli.py start \
-  --provider claude \
-  --skill imboss \
-  --prompt "按 imboss 路径 E 持续执行当前 active plan；本轮指令已授权推进，禁止只汇报状态后询问是否开工或要不要继续。每轮重新读取 .boss/CONVENTIONS.md、.boss/PROFILE.md、.boss/plans/INDEX.md、唯一 active plan、相关 requirements、architecture 和 .boss/tasks/INDEX.md；确认 active plan 不超过 200 行；若当前/最新阶段没有 planned 条目，先在 plan 内补出一批可直接开工的初步条目，但不预建 task 文档；随后基于当前文档状态选择下一个最小可验证 plan 条目。若该条目还没有 task 文档，先创建 .boss/tasks/.../task.md，并更新 plan 与 tasks/INDEX.md；task 执行记录使用 YYYY-MM-DDTHH:mm:ss+08:00 时间戳。然后执行、验证并更新 task/active plan/交付物。task 完成并验证通过后，如果工作区是 git 仓库，提交一次只包含本 task 相关改动的小 commit；不能安全提交时在 task 记录里说明原因。不要在规划阶段批量预建 task 文档，不要依赖启动时的旧进度快照。"
-
-# 示例 3：只生成文档
-python tools/mc-cli.py start \
-  --provider claude \
-  --prompt "读取 src/ 下所有文件，生成架构文档写入 .boss/architecture/OVERVIEW.md"
-```
-
-## mc-status-window.py
-
-浮动 Tkinter 状态窗口，只读观察所有 MC Core 实例。
-
-```
-python tools/mc-status-window.py --root .boss
-python tools/mc-status-window.py --root .boss --all --refresh 3
-```
-
-## scan-agent-clis.py
-
-扫描本地可用的 Agent CLI，输出可用列表。
-
-```
-python tools/scan-agent-clis.py
-python tools/scan-agent-clis.py --json
-```
-
-## 与 imboss 的协作
-
-MC Core 跑起来后，每轮：
-1. 启动 Agent CLI（claude / codex / opencode / gemini）
-2. Agent CLI 收到启动时显式提供的 prompt；如果传了 `--skill`，Core 只加一段加载 skill 的前置语
-3. Agent 按 prompt 和 skill 规则读取 `.boss/plans/INDEX.md`、requirements、architecture、tasks 等上下文
-4. Agent 执行、验证并更新相应文档；需要长执行记录时写入 `.boss/tasks/`
-5. Agent 退出，Core 等待 interval 秒后启动下一轮
-
-`.boss/` 是 imboss 的工作目录，`.boss/plans/INDEX.md` 是计划入口，唯一 active 大 plan 是计划中枢。这些都是 Agent/skill 的工作纪律，不是 MC Core 的内置逻辑。MC Core 不管理任务，只管理进程生命周期。
+安装器会保守合并现有配置，不会清空已有 hooks。项目级开关模板见 [`assets/stop-hooks/ff.yaml`](assets/stop-hooks/ff.yaml)。
