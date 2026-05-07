@@ -86,7 +86,7 @@ description: 我是老板——用开会的方式把项目聊清楚。需求、�
 2. 老板在干什么？
    - 求知 → [`path-d-learn.md`](path-d-learn.md)
    - 讨论 → [`path-a-meeting.md`](path-a-meeting.md)
-   - 长期目标、阶段推进、plans/tasks 执行 → [`path-e-plan-execution.md`](path-e-plan-execution.md)
+   - 长期目标、阶段推进、plans/tasks 执行 → [`path-e-plan-execution.md`](path-e-plan-execution.md)，硬规则见 [`path-e-guardrails.md`](path-e-guardrails.md)
    - 命令 → [`path-b-direct.md`](path-b-direct.md)
 
 不确定时默认走路径 A。所有路径共享[五个操作](operations.md)。
@@ -99,6 +99,8 @@ description: 我是老板——用开会的方式把项目聊清楚。需求、�
 - PROFILE.md：老板画像——技术深度、偏好、关注点
 
 这只是基础上下文，不是全部上下文。进入路径 E、写代码、落架构或处理任务时，继续读取相关 `.boss/requirements/` 和 `.boss/architecture/`。长期计划以用户需求为锚点，不能只看 plans/tasks 自转。
+
+路径 E 的主文档是执行者手册，先决定怎么推进；`path-e-guardrails.md` 是护栏，用来防止破坏 plan/task/requirements 边界。不要把执行轮次变成审计报告。
 
 ## 目录约定
 
@@ -130,7 +132,7 @@ AI 发现模式反复出现、现有指令覆盖不到，主动提议更新技�
 
 ```bash
 # 启动 MC Core，每轮自动加载 imboss；具体工作指令由启动 prompt 明确给出
-python tools/mc-cli.py start --provider claude --skill imboss --prompt "按 imboss 路径 E 持续执行当前 active plan；本轮指令已授权推进，禁止只汇报状态后询问是否开工或要不要继续。每轮重新读取 .boss/plans/INDEX.md、唯一 active plan、相关 requirements、architecture 和 .boss/tasks/INDEX.md；根据当前文档状态选择下一个最小可验证 plan 条目。若该条目还没有 task 文档，先创建 .boss/tasks/.../task.md 并更新 plan/tasks 索引；然后执行、验证并更新文档。plan 只维护条目、task 链接、顺序和状态摘要；不要依赖启动时的旧进度快照。"
+python tools/mc-cli.py start --provider claude --skill imboss --prompt "按 imboss 路径 E 持续执行当前 active plan；本轮指令已授权推进，禁止只汇报状态后询问是否开工或要不要继续。每轮重新读取 .boss/plans/INDEX.md、唯一 active plan、相关 requirements、architecture、.boss/tasks/INDEX.md 和 path-e-guardrails.md；根据当前文档状态选择下一个最小可验证 plan 条目。若该条目还没有 task 文档，先创建 .boss/tasks/.../task.md 并更新 plan/tasks 索引；然后执行、验证并更新文档。plan 只维护条目、task 链接、顺序和状态摘要；不要依赖启动时的旧进度快照。"
 
 # 自定义推进提示词
 python tools/mc-cli.py start --provider claude --skill imboss --prompt "按 imboss 路径 E 持续推进当前唯一 active plan；每轮自行判断当前阶段和下一个 plan 条目，真正开工时再创建 task 文档，不能在规划阶段批量预建 tasks。"

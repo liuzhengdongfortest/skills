@@ -67,6 +67,8 @@ python tools/mc-cli.py window --all   # 显示所有注册的 .boss root
 
 `--prompt` 或 `--prompt-file` 是必需的。MC Core 没有默认提示词，启动者必须自行规定 Agent 每轮收到的工作指令：
 
+本节是 MC Core 的操作说明，不是路径 E 本身。路径 E 是被拉起的执行者手册；MC Core 如何拼 prompt、如何常驻、如何表达授权语义，都放在这里，不要搬进 `path-e-plan-execution.md`。
+
 常驻执行的 prompt 必须和当前进度解耦。它应该描述“每轮如何重新读取状态、选择下一个动作、更新文档和验证”，而不是写死某个阶段、某个 task 编号或某个临时结论。MC Core 会复用同一 prompt；如果 prompt 里包含进度快照，阶段推进后会反复把 Agent 拉回旧状态。
 
 如果 prompt 涉及 imboss 路径 E，必须明确：planning 只在 plan 里列待执行条目，不批量创建 task 文档；Agent 真正选择某个条目开工时，才创建 `.boss/tasks/.../task.md`，并更新 plan 与 `tasks/INDEX.md`。不要让 Agent 把 task 主体写成 active plan 里的一行 markdown 待办。
