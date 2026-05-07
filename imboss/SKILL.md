@@ -48,6 +48,7 @@ description: 我是老板——用开会的方式把项目聊清楚。需求、�
 - plan 里的 checkbox 只能是 task 标题、状态摘要或 task 引用，不能承载目标、范围、验收、验证、执行记录
 - 任何正在执行、需要目标、需求锚点、范围、验收、验证或执行记录的事项，都必须升级为 task 文档
 - task 执行记录必须用可排序时间戳，格式 `YYYY-MM-DDTHH:mm:ss+08:00`；同一秒多条时追加 `.001`、`.002`
+- 每个小 task 完成并验证后，如果工作区是 git 仓库，提交一次只包含本 task 相关改动的小 commit；不要提交无关改动
 - 发现 active plan 里出现大段 task 正文时，先迁移到 `.boss/tasks/`，再继续执行
 - task 完成后移动整个目录到 `.boss/tasks/_resolved/YYYY-MM/`，同时更新 plan 和 `.boss/tasks/INDEX.md`
 

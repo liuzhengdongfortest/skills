@@ -173,6 +173,8 @@ task 必须在真正执行时创建为 `.boss/tasks/YYYY-MM-DD-描述/task.md` �
 
 task 的执行记录必须用可排序时间戳，而不是只写日期。推荐格式：`YYYY-MM-DDTHH:mm:ss+08:00`。如果同一秒内需要写多条，追加毫秒或序号，如 `2026-05-07T18:42:13.001+08:00`。
 
+task 完成并验证通过后，如果当前工作区是 git 仓库，必须做一次小提交。提交只包含本 task 相关改动：代码、测试、文档、plan/task 状态更新和交付物。不要提交用户已有的无关改动；如果工作区没有 git 仓库，或存在无法安全拆分的无关改动，在 task 执行记录里写明 `git commit skipped` 和原因。
+
 task 文档推荐结构：
 
 ```md
@@ -199,6 +201,9 @@ plan: ../plans/xxx.md
 
 ## 验证
 要跑哪些测试、样本、截图、trace 或人工检查。
+
+## Git
+完成并验证后提交一次小 commit；不是 git 仓库或不能安全提交时记录原因。
 
 ## 执行记录
 - YYYY-MM-DDTHH:mm:ss+08:00：...
@@ -236,9 +241,10 @@ plan: ../plans/xxx.md
 5. 执行任务
 6. 跑实际验证：测试、构建、样本、竞品对比、截图、trace，按任务需要选择
 7. 把验证结果和证据路径写回 plan
-8. 更新 task 文档状态；完成后归档到 `.boss/tasks/_resolved/YYYY-MM/`，并更新 plan 和 tasks index
-9. 如果当前阶段偏离需求，先调整阶段和 tasks，再继续
-10. 如果当前阶段 tasks 全部完成，补阶段总结，再拆下一阶段 tasks
+8. 如果 task 完成且验证通过，在 git 仓库中提交一次只包含本 task 相关改动的小 commit；不能提交时记录原因
+9. 更新 task 文档状态；完成后归档到 `.boss/tasks/_resolved/YYYY-MM/`，并更新 plan 和 tasks index
+10. 如果当前阶段偏离需求，先调整阶段和 tasks，再继续
+11. 如果当前阶段 tasks 全部完成，补阶段总结，再拆下一阶段 tasks
 
 默认不要停。能验证的就先验证，能修的就先修；当前 task 卡住，就换同一需求锚点下的其他 task。
 
@@ -282,6 +288,7 @@ plan: ../plans/xxx.md
 - active plan 的阶段 X tasks 是否全部完成或明确转入后续
 - 执行记录是否说明做了什么、发现了什么、改了什么
 - 验证证据是否存在：测试输出、报告路径、截图、trace、文档之一
+- 每个完成的小 task 是否已有对应 git commit；没有则 task 记录里必须说明跳过原因
 - `.boss/plans/INDEX.md` 是否仍只指向正确 active plan
 
 没过门禁，不要说“阶段完成”。
@@ -297,6 +304,7 @@ plan: ../plans/xxx.md
 - plan：只保留条目、已创建 task 链接、顺序和状态摘要
 - `.boss/tasks/INDEX.md`：只放已经创建且仍活跃的 task 索引
 - 完成后：移动整个 task 目录到 `.boss/tasks/_resolved/YYYY-MM/`
+- 完成且验证通过后：如果是 git 仓库，提交一次只包含本 task 相关改动的小 commit
 - `.boss/tasks/INDEX.md` 只放活跃任务索引，保持清爽
 
 ## 禁止项
@@ -311,6 +319,8 @@ plan: ../plans/xxx.md
 - 禁止只用内部 plan，不更新 `.boss/plans`
 - 禁止事后一次性补账伪装成执行中维护
 - 禁止没有验证证据就汇报阶段完成
+- 禁止完成 task 后不提交也不记录跳过原因
+- 禁止把无关用户改动混进 task commit
 - 禁止让 active plan 超过 200 行后继续执行或汇报
 
 ## 退场
