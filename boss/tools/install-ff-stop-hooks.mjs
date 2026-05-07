@@ -95,7 +95,7 @@ const command = commandFor(hookScript);
 
 const codexHooksPath = path.join(home, ".codex", "hooks.json");
 const codexHooks = readJson(codexHooksPath, { hooks: {} });
-ensureHookCommand(codexHooks, "Stop", command, { statusMessage: "Checking .ai/ff.yaml" });
+ensureHookCommand(codexHooks, "Stop", command, { statusMessage: "Checking 牛马模式" });
 writeJson(codexHooksPath, codexHooks);
 ensureCodexFeature(path.join(home, ".codex", "config.toml"));
 
@@ -117,5 +117,5 @@ const pluginUrl = pathToFileURL(opencodePluginPath).href;
 if (!opencodeConfig.plugin.includes(pluginUrl)) opencodeConfig.plugin.push(pluginUrl);
 writeJson(opencodeConfigPath, opencodeConfig);
 
-console.log("Installed ff stop hooks for Codex, Claude Code, and OpenCode.");
+console.log("Installed 牛马模式 for Codex, Claude Code, and OpenCode.");
 console.log(`Hook runner: ${hookScript}`);

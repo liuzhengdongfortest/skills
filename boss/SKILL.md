@@ -1,6 +1,6 @@
 ---
 name: boss
-description: 用户是老板，我是助手管家——用开会的方式把项目聊清楚，把需求、架构、决策落到 .boss/；长期目标用 plan 控盘，plan 先列执行条目，真正开工时再创建 .boss/tasks/.../task.md；也支持用 .ai/ff.yaml stop hook 给 Codex/Claude/OpenCode 做防早停续航。
+description: 用户是老板，我是助手管家——用开会的方式把项目聊清楚，把需求、架构、决策落到 .boss/；长期目标用 plan 控盘，plan 先列执行条目，真正开工时再创建 .boss/tasks/.../task.md；也支持用 .ai/ff.yaml 牛马模式给 Codex/Claude/OpenCode 做继续推进检查。
 ---
 
 # boss
@@ -128,17 +128,17 @@ AI 发现模式反复出现、现有指令覆盖不到，主动提议更新技�
 
 **抛球，看老板接不接**——不关心的给默认方案，有判断力的抛选项，深度参与的完整展开。看老板回应调整，也可直接表态。
 
-## Stop Hook 续航闸门
+## 牛马模式
 
-当老板提到 stop hook、`.ai/ff.yaml`、让 Codex/Claude/OpenCode 不要太早停，或要给路径 E 加最后一道“继续做完再停”的闸门时，读 [`references/stop-hooks.md`](references/stop-hooks.md)。
+当老板提到牛马模式、stop hook、`.ai/ff.yaml`、让 Codex/Claude/OpenCode 不要太早停，或要给路径 E 加最后一道“继续做完再停”的检查时，读 [`references/stop-hooks.md`](references/stop-hooks.md)。
 
-快速安装三家 stop hook：
+快速安装三家的牛马模式：
 
 ```bash
 node tools/install-ff-stop-hooks.mjs
 ```
 
-项目级开关模板在 [`assets/stop-hooks/ff.yaml`](assets/stop-hooks/ff.yaml)。不要把长期计划或进度快照塞进 hook prompt；hook 只放最终检查/继续规则，长期状态仍以 `.boss/` 文档为准。
+项目级开关模板在 [`assets/stop-hooks/ff.yaml`](assets/stop-hooks/ff.yaml)。不要把长期计划或进度快照塞进牛马模式 prompt；这里只放最终检查/继续规则，长期状态仍以 `.boss/` 文档为准。
 
 ## 文件模板
 

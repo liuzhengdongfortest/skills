@@ -4,7 +4,7 @@
 
 ## install-ff-stop-hooks.mjs
 
-把 `.ai/ff.yaml` stop hook 续航闸门安装到 Codex、Claude Code、OpenCode。详细规则见 [`references/stop-hooks.md`](references/stop-hooks.md)。
+把 `.ai/ff.yaml` 牛马模式安装到 Codex、Claude Code、OpenCode。详细规则见 [`references/stop-hooks.md`](references/stop-hooks.md)。
 
 ```bash
 node tools/install-ff-stop-hooks.mjs

@@ -35,16 +35,20 @@ export const FFStopGate = async ({ client, directory, worktree }) => {
 
   return {
     event: async ({ event }) => {
-      if (event.type !== "session.idle") return;
+      const part = event.properties?.part;
+      const isIdle = event.type === "session.idle";
+      const isStopStep =
+        event.type === "message.part.updated" && part?.type === "step-finish" && part?.reason === "stop";
+      if (!isIdle && !isStopStep) return;
 
-      const sessionID = event.properties?.sessionID;
+      const sessionID = event.properties?.sessionID || part?.sessionID;
       if (!sessionID || continued.has(sessionID)) return;
 
-      let cwd = directory || worktree || process.cwd();
+      let cwd = event.properties?.directory || directory || worktree || process.cwd();
       try {
         const response = await client.session.get({ path: { id: sessionID } });
         const session = response?.data ?? response;
-        cwd = session?.directory || cwd;
+        cwd = session?.directory || session?.info?.directory || session?.path?.cwd || cwd;
       } catch {
         // Fall back to the plugin context directory.
       }
