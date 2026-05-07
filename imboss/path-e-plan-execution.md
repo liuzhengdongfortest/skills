@@ -226,7 +226,9 @@ plan: ../plans/xxx.md
 
 ## 默认授权
 
-启动 MC Core、让 Agent “继续执行”、或进入路径 E，默认表示老板已经授权助手推进当前 active plan。
+Agent CLI 不天然知道自己是不是由 MC Core 拉起；它只看得到本轮 prompt 和 skill。默认授权必须由用户指令、启动 prompt 或路径 E 语义传达给 Agent。
+
+当本轮指令包含“执行”“继续推进”“按路径 E”“持续执行当前 active plan”等语义时，默认表示老板已经授权助手推进当前 active plan。
 
 执行轮次里禁止把授权再还给老板：
 

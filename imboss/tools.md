@@ -71,7 +71,7 @@ python tools/mc-cli.py window --all   # 显示所有注册的 .boss root
 
 如果 prompt 涉及 imboss 路径 E，必须明确：planning 只在 plan 里列待执行条目，不批量创建 task 文档；Agent 真正选择某个条目开工时，才创建 `.boss/tasks/.../task.md`，并更新 plan 与 `tasks/INDEX.md`。不要让 Agent 把 task 主体写成 active plan 里的一行 markdown 待办。
 
-MC Core 启动即表示老板已授权持续推进。路径 E 的常驻 prompt 必须禁止 Agent 只汇报状态后询问“是否开工”“要不要继续”；Agent 每轮都应选择一个安全、可验证、需求锚定的动作并推进。
+Agent CLI 不天然知道自己是否由 MC Core 拉起，它只看得到本轮 prompt 和 skill。路径 E 的常驻 prompt 必须显式写明“本轮是持续执行，已授权推进”，并禁止 Agent 只汇报状态后询问“是否开工”“要不要继续”；Agent 每轮都应选择一个安全、可验证、需求锚定的动作并推进。
 
 路径 E 的常驻 prompt 还必须说明：每个小 task 完成并验证通过后，如果工作区是 git 仓库，要提交一次只包含本 task 相关改动的小 commit；不能安全提交时，把跳过原因写进 task 记录。
 
@@ -87,7 +87,7 @@ python tools/mc-cli.py start \
 python tools/mc-cli.py start \
   --provider claude \
   --skill imboss \
-  --prompt "按 imboss 路径 E 执行：MC Core 启动即表示老板已授权推进，禁止只汇报状态后询问是否开工或要不要继续。每轮重新读取 .boss/CONVENTIONS.md、.boss/PROFILE.md、.boss/plans/INDEX.md、唯一 active plan、相关 requirements、architecture 和 .boss/tasks/INDEX.md；确认 active plan 不超过 200 行；若当前/最新阶段没有 planned 条目，先在 plan 内补出一批可直接开工的初步条目，但不预建 task 文档；随后基于当前文档状态选择下一个最小可验证 plan 条目。若该条目还没有 task 文档，先创建 .boss/tasks/.../task.md，并更新 plan 与 tasks/INDEX.md；task 执行记录使用 YYYY-MM-DDTHH:mm:ss+08:00 时间戳。然后执行、验证并更新 task/active plan/交付物。task 完成并验证通过后，如果工作区是 git 仓库，提交一次只包含本 task 相关改动的小 commit；不能安全提交时在 task 记录里说明原因。不要在规划阶段批量预建 task 文档，不要依赖启动时的旧进度快照。"
+  --prompt "按 imboss 路径 E 持续执行当前 active plan；本轮指令已授权推进，禁止只汇报状态后询问是否开工或要不要继续。每轮重新读取 .boss/CONVENTIONS.md、.boss/PROFILE.md、.boss/plans/INDEX.md、唯一 active plan、相关 requirements、architecture 和 .boss/tasks/INDEX.md；确认 active plan 不超过 200 行；若当前/最新阶段没有 planned 条目，先在 plan 内补出一批可直接开工的初步条目，但不预建 task 文档；随后基于当前文档状态选择下一个最小可验证 plan 条目。若该条目还没有 task 文档，先创建 .boss/tasks/.../task.md，并更新 plan 与 tasks/INDEX.md；task 执行记录使用 YYYY-MM-DDTHH:mm:ss+08:00 时间戳。然后执行、验证并更新 task/active plan/交付物。task 完成并验证通过后，如果工作区是 git 仓库，提交一次只包含本 task 相关改动的小 commit；不能安全提交时在 task 记录里说明原因。不要在规划阶段批量预建 task 文档，不要依赖启动时的旧进度快照。"
 
 # 示例 3：只生成文档
 python tools/mc-cli.py start \
