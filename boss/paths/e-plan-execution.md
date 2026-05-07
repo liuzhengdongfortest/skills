@@ -21,7 +21,7 @@ plan 是控制面板，写长期目标、阶段框架、当前阶段、待执行
 
 阶段可以变，用户需求才是锚点。每次推进都要能解释为更好地满足 `.boss/requirements/` 里的用户故事或老板当前明确目标。
 
-plan 不是待办拆解器。进入或更新 plan 时，要用挑剔工程师、优秀产品经理和聪明 AI 参谋三个视角检查：产品路径是否对、工程承载是否稳、设计基调是否合适、验证是否真实、风险是否有退出条件。发现现有 plan 只会堆功能而忽略这些维度时，先修 plan，再执行。
+plan 不是待办拆解器。进入或更新 plan 时，要用挑剔工程师、优秀产品经理和聪明 AI 参谋三个视角检查：产品路径是否对、工程承载是否稳、设计基调是否合适、验证是否真实、风险是否有退出条件。细则见 [`../guides/plan-quality.md`](../guides/plan-quality.md)。发现现有 plan 只会堆功能而忽略这些维度时，先修 plan，再执行。
 
 ## 进入动作
 
@@ -36,6 +36,8 @@ plan 不是待办拆解器。进入或更新 plan 时，要用挑剔工程师、
 
 如果 active plan 超过 200 行，先压缩。压缩只保留当前可操作状态，旧流水账可以丢；具体执行细节由 task 文档和交付物承载。
 
+如果 active plan 的当前状态是一长串同级干条目，先按 [`../guides/information-architecture.md`](../guides/information-architecture.md) 重组：先给阶段总结，再按能力/子系统/风险分组，最后列细项。不要让人类读者在平铺 bullet 里找地图。
+
 如果当前/最新阶段没有 planned 条目，先在 plan 里补出一批能直接开工的初步条目，但不要预建 task 文档。补完不要停，继续选择一个条目执行。
 
 ## 每轮怎么动
@@ -45,12 +47,13 @@ plan 不是待办拆解器。进入或更新 plan 时，要用挑剔工程师、
 3. 如果条目还没有 task 文档，创建 `.boss/tasks/YYYY-MM-DD-描述/task.md`，写入目标、需求锚点、范围、验收、验证、执行记录，并更新 active plan 和 `.boss/tasks/INDEX.md`。
 4. 在 task 文档执行记录里用 `YYYY-MM-DDTHH:mm:ss+08:00` 写下本轮要推进什么。
 5. 执行改动。
-6. 做验证：测试、构建、样本、竞品对比、截图、trace，按任务需要选择。
-7. 把验证结果和证据路径写回 task/plan/交付物。
-8. task 完成且验证通过后，如果工作区是 git 仓库，提交一次只包含本 task 相关改动的小 commit；不能安全提交时，在 task 记录里写明 `git commit skipped` 和原因。
-9. 执行工作区清理：运行 `git status --short --untracked-files=all`，把漏提交文件补提交，把可归因的无关改动单独提交，把用户或来源不明改动记录清楚。不要把脏工作区无说明地留给下一轮。
-10. 完成后移动 task 目录到 `.boss/tasks/_resolved/YYYY-MM/`，并更新 active plan 和 `.boss/tasks/INDEX.md`。
-11. 如果当前阶段条目全部完成，补阶段总结，再在 plan 里拆下一阶段的初步 planned 条目，然后继续执行下一条安全工作。
+6. 执行中持续发现问题，按 [`../guides/execution-discovery.md`](../guides/execution-discovery.md) 判断：能安全顺手修的直接修，超出范围的落 task/plan/wiki，需要老板拍板的记录选项。
+7. 做验证：测试、构建、样本、竞品对比、截图、trace，按任务需要选择。
+8. 把验证结果、证据路径和执行中发现的问题处理结果写回 task/plan/交付物。
+9. task 完成且验证通过后，如果工作区是 git 仓库，提交一次只包含本 task 相关改动的小 commit；不能安全提交时，在 task 记录里写明 `git commit skipped` 和原因。
+10. 执行工作区清理：运行 `git status --short --untracked-files=all`，把漏提交文件补提交，把可归因的无关改动单独提交，把用户或来源不明改动记录清楚。不要把脏工作区无说明地留给下一轮。
+11. 完成后移动 task 目录到 `.boss/tasks/_resolved/YYYY-MM/`，并更新 active plan 和 `.boss/tasks/INDEX.md`。
+12. 如果当前阶段条目全部完成，补阶段总结，再在 plan 里拆下一阶段的初步 planned 条目，然后继续执行下一条安全工作。
 
 ## 默认授权
 
