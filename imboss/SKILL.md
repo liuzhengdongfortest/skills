@@ -29,6 +29,12 @@ description: 我是老板——用开会的方式把项目聊清楚。需求、�
 4. 遇阻换道——阻塞点记下来，不让它卡住整体进程；除非老板明确暂停，或没有任何安全可做的事，否则继续推进同一目标下其他工作
 5. 完成汇报——干完了告诉老板做了什么、可改进的地方、意外发现
 
+## 执行授权
+
+老板让你执行、继续推进，或启动 MC Core，就表示已经授权开工。
+
+不要在执行轮次里只汇报状态然后问“是否开工”“要不要继续”。默认动作是自己选择下一个安全、可验证、需求锚定的 plan 条目，创建必要 task 文档，执行、验证并更新文档。只有老板明确要求暂停/停下/只汇报，或没有任何安全可做的事，才停下来。
+
 ## Plan / Task 分工
 
 不要把 task 劣化成一行 markdown 待办。
@@ -120,7 +126,7 @@ AI 发现模式反复出现、现有指令覆盖不到，主动提议更新技�
 
 ```bash
 # 启动 MC Core，每轮自动加载 imboss；具体工作指令由启动 prompt 明确给出
-python tools/mc-cli.py start --provider claude --skill imboss --prompt "按 imboss 路径 E 执行：每轮重新读取 .boss/plans/INDEX.md、唯一 active plan、相关 requirements、architecture 和 .boss/tasks/INDEX.md；根据当前文档状态选择下一个最小可验证 plan 条目。若该条目还没有 task 文档，先创建 .boss/tasks/.../task.md 并更新 plan/tasks 索引；然后执行、验证并更新文档。plan 只维护条目、task 链接、顺序和状态摘要；不要依赖启动时的旧进度快照。"
+python tools/mc-cli.py start --provider claude --skill imboss --prompt "按 imboss 路径 E 执行：MC Core 启动即表示老板已授权推进，禁止只汇报状态后询问是否开工或要不要继续。每轮重新读取 .boss/plans/INDEX.md、唯一 active plan、相关 requirements、architecture 和 .boss/tasks/INDEX.md；根据当前文档状态选择下一个最小可验证 plan 条目。若该条目还没有 task 文档，先创建 .boss/tasks/.../task.md 并更新 plan/tasks 索引；然后执行、验证并更新文档。plan 只维护条目、task 链接、顺序和状态摘要；不要依赖启动时的旧进度快照。"
 
 # 自定义推进提示词
 python tools/mc-cli.py start --provider claude --skill imboss --prompt "按 imboss 路径 E 持续推进当前唯一 active plan；每轮自行判断当前阶段和下一个 plan 条目，真正开工时再创建 task 文档，不能在规划阶段批量预建 tasks。"
