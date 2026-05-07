@@ -11,6 +11,7 @@
 ```yaml
 # .ai/ff.yaml
 enabled: true
+repeat: 10
 prompt: |
   Run final verification before stopping.
   If anything fails, fix it before reporting done.
@@ -21,9 +22,13 @@ prompt: |
 - 不存在 `.ai/ff.yaml` 或 `.ai/ff.yml`：正常停止。
 - `enabled: false`：正常停止。
 - `enabled: true` 且 `prompt` 非空：Stop 时继续。
-- 默认只续一次，避免无限循环；确实需要每次 stop 都触发时加 `repeat: true`。
+- 默认只续一次，避免无限循环。
+- `repeat: 10`：最多连续续 10 次，第 11 次 stop 允许停止。
+- `repeat: true`：每次 stop 都触发，适合明确要无限续的场景。
 
 开关别名：`enabled`、`enable`、`active`、`on`、`switch`、`开关`。prompt 别名：`prompt`、`reason`、`message`、`提示`。
+
+重复次数也可用独立字段声明，别名：`repeat_count`、`repeat_times`、`repeat_limit`、`max_repeats`、`max_repeat`、`times`、`count`、`次数`、`重复次数`。独立字段优先于 `repeat`；例如 `repeat_count: 10` 和 `repeat: 10` 等价。计数按 session 和 `.ai/ff.yaml` 文件版本隔离，状态保存在 `~/.ai-hooks/ff-stop-state.json`，一天后自动清理。
 
 ## 三家差异
 

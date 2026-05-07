@@ -17,6 +17,7 @@ Usage:
 import time
 import json
 import sys
+import os
 
 from .TMWebDriver import TMWebDriver
 from . import simphtml
@@ -25,7 +26,34 @@ _driver = None
 
 
 def _log(*args, **kwargs):
-    print(*args, file=sys.stderr, **kwargs)
+    if _debug_enabled():
+        print(*args, file=sys.stderr, **kwargs)
+
+
+def _debug_enabled():
+    return os.environ.get('BROWSER_BRIDGE_DEBUG', '').lower() in ('1', 'true', 'yes', 'on', 'debug')
+
+
+def _success(**data):
+    return {"status": "success", **data}
+
+
+def _error(message, code="error", **data):
+    return {"status": "error", "error": {"code": code, "message": str(message)}, **data}
+
+
+def _normalize_result(result, default_code="error"):
+    if not isinstance(result, dict):
+        return result
+    status = result.get("status")
+    if status == "success":
+        return result
+    if status in ("error", "failed"):
+        message = result.get("msg") or result.get("error") or "Unknown error"
+        code = "execution_failed" if status == "failed" else default_code
+        data = {k: v for k, v in result.items() if k not in ("status", "msg", "error")}
+        return _error(message, code=code, **data)
+    return result
 
 
 def init_browser(host='127.0.0.1', port=18765, wait=True):
@@ -88,20 +116,20 @@ def web_execute_js(script, switch_tab_id=None, no_monitor=False, wait_selector=N
 
     Returns:
         dict with keys:
-            status: "success" or "failed"
+            status: "success" or "error"
             js_return: The return value of your JavaScript (after smart processing)
             diff: DOM change summary string
             transients: List of ephemeral text snippets captured during execution
             newTabs: List of new tabs opened during execution
             tab_id: The tab where the script executed
-            error: Error message if status is "failed"
+            error: Error object if status is "error"
             reloaded: True if the page reloaded during execution
             suggestion: Hint about what happened (e.g. "页面无明显变化")
     """
     driver = get_driver()
     sessions = driver.get_all_sessions()
     if len(sessions) == 0:
-        return {"status": "error", "msg": "No browser tabs available. Is the extension connected?"}
+        return _error("No browser tabs available. Is the extension connected?", code="no_tabs")
     if switch_tab_id:
         driver.default_session_id = switch_tab_id
     elif driver.default_session_id is None and sessions:
@@ -109,7 +137,7 @@ def web_execute_js(script, switch_tab_id=None, no_monitor=False, wait_selector=N
     if wait_selector:
         wait_js = f'await new Promise((resolve, reject) => {{ const start = Date.now(); const check = () => {{ const el = document.querySelector({json.dumps(wait_selector)}); if (el) return resolve(el); if (Date.now() - start > {wait_ms}) return reject(new Error("Timeout waiting for: " + {json.dumps(wait_selector)})); setTimeout(check, 200); }}; check(); }});'
         script = wait_js + '\n' + script
-    return simphtml.execute_js_rich(script, driver, no_monitor=no_monitor, timeout=timeout)
+    return _normalize_result(simphtml.execute_js_rich(script, driver, no_monitor=no_monitor, timeout=timeout), default_code="execute_error")
 
 
 def web_scan(tabs_only=False, switch_tab_id=None, text_only=False, size_only=False,
@@ -140,12 +168,12 @@ def web_scan(tabs_only=False, switch_tab_id=None, text_only=False, size_only=Fal
             url: Current tab URL (unless tabs_only)
             tab_id: Current tab ID (unless tabs_only)
             sessions: List of {id, url, title} for all tabs (tabs_only only)
-            msg: Error message if status is "error"
+            error: Error object if status is "error"
     """
     driver = get_driver()
     sessions = driver.get_all_sessions()
     if len(sessions) == 0:
-        return {"status": "error", "msg": "No browser tabs available. Is the extension connected?"}
+        return _error("No browser tabs available. Is the extension connected?", code="no_tabs")
     if switch_tab_id:
         driver.default_session_id = switch_tab_id
     elif driver.default_session_id is None and sessions:
@@ -154,21 +182,21 @@ def web_scan(tabs_only=False, switch_tab_id=None, text_only=False, size_only=Fal
         wait_result = simphtml.execute_js_rich(
             f'await new Promise((resolve, reject) => {{ const start = Date.now(); const check = () => {{ const el = document.querySelector({json.dumps(wait_selector)}); if (el) return resolve(el); if (Date.now() - start > {wait_ms}) return reject(new Error("Timeout waiting for: " + {json.dumps(wait_selector)})); setTimeout(check, 200); }}; check(); }});',
             driver, no_monitor=True)
-        if wait_result.get('status') == 'failed':
-            return {"status": "error", "msg": f"Timeout waiting for selector: {wait_selector}"}
+        if wait_result.get('status') in ('failed', 'error'):
+            return _error(f"Timeout waiting for selector: {wait_selector}", code="wait_timeout")
     try:
         if tabs_only:
-            return {"status": "success", "sessions": sessions}
-        html = simphtml.get_html(driver, text_only=text_only)
+            return _success(sessions=_public_sessions(sessions))
+        html, meta = simphtml.get_html(driver, text_only=text_only, return_meta=True)
         cur = next((s for s in sessions if s['id'] == driver.default_session_id), {})
-        result = {"status": "success", "html": html, "url": cur.get('url', ''), "tab_id": driver.default_session_id}
+        result = _success(html=html, url=cur.get('url', ''), tab_id=driver.default_session_id, scan=meta)
         if size_only:
             result["size"] = len(html)
             result["text_only"] = text_only
             result.pop("html", None)
         return result
     except Exception as e:
-        return {"status": "error", "msg": str(e)}
+        return _error(e, code="scan_error")
 
 
 def _wait_for_page_load(driver, timeout_ms=30000):
@@ -196,11 +224,14 @@ def web_navigate(url, wait_load=True):
         dict with status, navigated_to, loaded (bool)
     """
     driver = get_driver()
-    driver.jump(url)
-    loaded = False
-    if wait_load:
-        loaded = _wait_for_page_load(driver)
-    return {'status': 'success', 'navigated_to': url, 'loaded': loaded}
+    try:
+        driver.jump(url)
+        loaded = False
+        if wait_load:
+            loaded = _wait_for_page_load(driver)
+        return _success(navigated_to=url, loaded=loaded)
+    except Exception as e:
+        return _error(e, code="navigate_error", navigated_to=url, loaded=False)
 
 
 def web_back(wait_load=True):
@@ -213,11 +244,14 @@ def web_back(wait_load=True):
         dict with status and loaded (bool)
     """
     driver = get_driver()
-    driver.back()
-    loaded = False
-    if wait_load:
-        loaded = _wait_for_page_load(driver)
-    return {'status': 'success', 'loaded': loaded}
+    try:
+        driver.back()
+        loaded = False
+        if wait_load:
+            loaded = _wait_for_page_load(driver)
+        return _success(loaded=loaded)
+    except Exception as e:
+        return _error(e, code="back_error", loaded=False)
 
 
 def web_forward(wait_load=True):
@@ -230,11 +264,14 @@ def web_forward(wait_load=True):
         dict with status and loaded (bool)
     """
     driver = get_driver()
-    driver.forward()
-    loaded = False
-    if wait_load:
-        loaded = _wait_for_page_load(driver)
-    return {'status': 'success', 'loaded': loaded}
+    try:
+        driver.forward()
+        loaded = False
+        if wait_load:
+            loaded = _wait_for_page_load(driver)
+        return _success(loaded=loaded)
+    except Exception as e:
+        return _error(e, code="forward_error", loaded=False)
 
 
 def web_reload(wait_load=True):
@@ -247,11 +284,14 @@ def web_reload(wait_load=True):
         dict with status and loaded (bool)
     """
     driver = get_driver()
-    driver.reload()
-    loaded = False
-    if wait_load:
-        loaded = _wait_for_page_load(driver)
-    return {'status': 'success', 'loaded': loaded}
+    try:
+        driver.reload()
+        loaded = False
+        if wait_load:
+            loaded = _wait_for_page_load(driver)
+        return _success(loaded=loaded)
+    except Exception as e:
+        return _error(e, code="reload_error", loaded=False)
 
 
 def web_newtab(url=None):
@@ -265,7 +305,10 @@ def web_newtab(url=None):
     """
     driver = get_driver()
     before = {str(s.get('id')) for s in driver.get_all_sessions()}
-    raw = driver.newtab(url)
+    try:
+        raw = driver.newtab(url)
+    except Exception as e:
+        return _error(e, code="newtab_error", newtab=url or 'about:blank')
     tab = raw.get('data') if isinstance(raw, dict) else None
     if not isinstance(tab, dict):
         tab = {}
@@ -287,11 +330,11 @@ def web_newtab(url=None):
             break
         time.sleep(0.2)
 
-    result = {'status': 'success', 'newtab': url or 'about:blank'}
+    result = _success(newtab=url or 'about:blank')
     if tab_id:
         result['tab_id'] = tab_id
     if tab:
-        result['tab'] = tab
+        result['tab'] = _public_session(tab)
     return result
 
 
@@ -306,8 +349,11 @@ def web_close(tab_id=None):
     """
     driver = get_driver()
     closed_id = str(tab_id) if tab_id else driver.default_session_id
-    driver.close_tab(tab_id)
-    return {'status': 'success', 'closed_tab_id': closed_id}
+    try:
+        driver.close_tab(tab_id)
+        return _success(closed_tab_id=closed_id)
+    except Exception as e:
+        return _error(e, code="close_error", closed_tab_id=closed_id)
 
 
 def web_screenshot(filepath=None):
@@ -329,23 +375,35 @@ def web_screenshot(filepath=None):
         # Navigate CDP response: {data: {data: "base64..."}}
         b64 = data.get('data') if isinstance(data, dict) else None
         if not b64:
-            return {'status': 'error', 'msg': 'Screenshot returned no image data'}
+            return _error('Screenshot returned no image data', code="screenshot_empty")
         if filepath is None:
             filepath = os.path.join(tempfile.gettempdir(), f'screenshot_{int(time.time())}.png')
         with open(filepath, 'wb') as f:
             f.write(base64.b64decode(b64))
-        return {'status': 'success', 'filepath': filepath}
+        return _success(filepath=filepath)
     except Exception as e:
-        return {'status': 'error', 'msg': str(e)}
+        return _error(e, code="screenshot_error")
 
 
 def list_tabs():
     """List all open browser tabs.
 
     Returns:
-        List of dicts with keys: id, url, title, connected_at
+        List of dicts with keys: id, url, title
     """
-    return get_driver().get_all_sessions()
+    return _public_sessions(get_driver().get_all_sessions())
+
+
+def _public_session(session):
+    return {
+        'id': str(session.get('id', '')),
+        'url': session.get('url', ''),
+        'title': session.get('title', ''),
+    }
+
+
+def _public_sessions(sessions):
+    return [_public_session(session) for session in sessions]
 
 
 def switch_tab(url_pattern):

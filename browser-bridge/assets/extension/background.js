@@ -25,9 +25,25 @@ async function handleExtMessage(msg, sender) {
         const tab = await chrome.tabs.create({ url: msg.url || 'about:blank' });
         return { ok: true, data: { id: tab.id, url: tab.url, title: tab.title } };
       }
+      if (msg.method === 'navigate') {
+        const tab = await chrome.tabs.update(msg.tabId, { url: msg.url });
+        return { ok: true, data: { id: tab.id, url: tab.url, title: tab.title } };
+      }
       if (msg.method === 'switch') {
         const tab = await chrome.tabs.update(msg.tabId, { active: true });
         await chrome.windows.update(tab.windowId, { focused: true });
+        return { ok: true };
+      }
+      if (msg.method === 'back') {
+        await chrome.tabs.goBack(msg.tabId);
+        return { ok: true };
+      }
+      if (msg.method === 'forward') {
+        await chrome.tabs.goForward(msg.tabId);
+        return { ok: true };
+      }
+      if (msg.method === 'reload') {
+        await chrome.tabs.reload(msg.tabId);
         return { ok: true };
       }
       if (msg.method === 'remove') {

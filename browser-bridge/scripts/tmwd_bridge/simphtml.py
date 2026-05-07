@@ -654,10 +654,18 @@ def get_temp_texts(driver):
     """  
     try: return list(set(driver.execute_js(js).get('data', [])))
     except Exception as e: 
-        print(e)
+        _debug(e)
         return []
     
-import time, re, os
+import time, re, os, sys, ast
+
+def _debug_enabled():
+    return os.environ.get('BROWSER_BRIDGE_DEBUG', '').lower() in ('1', 'true', 'yes', 'on', 'debug')
+
+def _debug(*args, **kwargs):
+    if _debug_enabled():
+        print(*args, file=sys.stderr, **kwargs)
+
 def get_main_block(driver, extra_js="", text_only=False): 
     page = driver.execute_js(f"{extra_js}\n{js_optHTML}\nreturn optHTML({str(text_only).lower()});").get('data', '')
     if text_only:
@@ -700,26 +708,46 @@ def find_changed_elements(before_html, after_html):
         result["top_change"] = h if len(h) <= 2000 else h[:2000] + '...[TRUNCATED]'
     return result
 
-def get_html(driver, cutlist=False, maxchars=35000, instruction="", extra_js="", text_only=False):
+def get_html(driver, cutlist=False, maxchars=35000, instruction="", extra_js="", text_only=False, return_meta=False):
     if cutlist: rr = driver.execute_js(js_findMainList + "return findMainList(document.body);").get('data', [])
     page = get_main_block(driver, extra_js=extra_js, text_only=text_only)
-    if text_only: return page
+    if text_only:
+        meta = {
+            "truncated": False,
+            "original_size": len(page),
+            "final_size": len(page),
+            "maxchars": None,
+            "cutlist": False,
+        }
+        return (page, meta) if return_meta else page
     soup = optimize_html_for_tokens(page)
     for div in soup.select('div[data-tag="iframe"]'):
         div.name = 'iframe'; del div['data-tag']
     html = str(soup)
-    if not cutlist: return html
+    if not cutlist:
+        final = html
+        truncated = len(final) > maxchars
+        if truncated:
+            final = str(smart_truncate(soup, maxchars))
+        meta = {
+            "truncated": truncated,
+            "original_size": len(html),
+            "final_size": len(final),
+            "maxchars": maxchars,
+            "cutlist": False,
+        }
+        return (final, meta) if return_meta else final
     lists = rr if isinstance(rr, list) else ([rr] if isinstance(rr, dict) and rr.get('selector') else [])
-    if lists: print(f"[cutlist] Found {len(lists)} list(s): {[e.get('selector','?') if isinstance(e,dict) else '?' for e in lists]}")
+    if lists: _debug(f"[cutlist] Found {len(lists)} list(s): {[e.get('selector','?') if isinstance(e,dict) else '?' for e in lists]}")
     for entry in lists:
         sel = entry.get('selector') if isinstance(entry, dict) else None
         if not sel: continue
         try: items = soup.select(sel)
-        except Exception: print(f'[cutlist] skip invalid selector: {sel}'); continue
+        except Exception: _debug(f'[cutlist] skip invalid selector: {sel}'); continue
         if len(items) < 5: continue
         total_len = sum(len(str(it)) for it in items)
         avg_len = total_len / len(items)
-        print(f"[cutlist]   '{sel}': {len(items)} items, avg {avg_len:.0f} chars, total {total_len}, if keep 3, save ~{total_len - 3 * avg_len:.0f} chars")
+        _debug(f"[cutlist]   '{sel}': {len(items)} items, avg {avg_len:.0f} chars, total {total_len}, if keep 3, save ~{total_len - 3 * avg_len:.0f} chars")
         if avg_len < 200 or (avg_len < 700 and total_len < 2500): continue
         hit = [it for it in items if instruction and instruction.strip() and instruction in it.get_text(" ",strip=True)]
         keep = hit[:6] if hit else items[:3]
@@ -735,9 +763,18 @@ def get_html(driver, cutlist=False, maxchars=35000, instruction="", extra_js="",
         if keep: keep[-1].insert_after(hint_tag)
         for it in removed: it.decompose()
     ss = str(optimize_html_for_tokens(soup)) if lists else html
-    print(f"[get_html] Result: {len(html)} -> {len(ss)} chars after cutlist ({100-len(ss)*100//len(html)}% saved)")
-    if len(ss) > maxchars: ss = str(smart_truncate(soup, maxchars))
-    return ss
+    _debug(f"[get_html] Result: {len(html)} -> {len(ss)} chars after cutlist ({100-len(ss)*100//len(html)}% saved)")
+    truncated = len(ss) > maxchars
+    if truncated: ss = str(smart_truncate(soup, maxchars))
+    meta = {
+        "truncated": truncated,
+        "original_size": len(html),
+        "final_size": len(ss),
+        "maxchars": maxchars,
+        "cutlist": bool(lists),
+        "list_candidates": len(lists),
+    }
+    return (ss, meta) if return_meta else ss
 
 def smart_truncate(soup, budget, _depth=0):
     """原地截断 soup 使其接近 budget 字符。
@@ -772,10 +809,10 @@ def smart_truncate(soup, budget, _depth=0):
     selflen = total - sum(l for _, l in kids)
     remaining_budget = max(budget - selflen, 0)
     tag = getattr(soup, 'name', '?')
-    print(f'{indent}[smart_truncate] <{tag}> total={total} budget={budget} selflen={selflen} kids={len(kids)}')
+    _debug(f'{indent}[smart_truncate] <{tag}> total={total} budget={budget} selflen={selflen} kids={len(kids)}')
     # === 1 kid: 穿透 ===
     if len(kids) == 1:
-        print(f'{indent}  -> single child, recurse into <{kids[0][0].name}>')
+        _debug(f'{indent}  -> single child, recurse into <{kids[0][0].name}>')
         smart_truncate(kids[0][0], remaining_budget, _depth)
         return soup
     over = sum(l for _, l in kids) - remaining_budget
@@ -791,7 +828,7 @@ def smart_truncate(soup, budget, _depth=0):
         while kids and removed < over:
             c, l = kids.pop(); c.decompose()
             removed += l; removed_count += 1
-        print(f'{indent}  -> tail-cut: removed {removed_count} children ({removed//1000}k chars) from end')
+        _debug(f'{indent}  -> tail-cut: removed {removed_count} children ({removed//1000}k chars) from end')
         return soup
     # === top 2-3 按比例分担 ===
     # 过滤掉太小的 kid（不到最大的 10%），让大的全扛
@@ -806,7 +843,7 @@ def smart_truncate(soup, budget, _depth=0):
         c, l = kids[i]
         share = int(over * l / top_total)
         new_keep = l - share
-        print(f'{indent}  -> <{c.name}> {l} -> {new_keep} (share={share})')
+        _debug(f'{indent}  -> <{c.name}> {l} -> {new_keep} (share={share})')
         actions.append((c, l, new_keep))
     # 再统一执行
     for c, l, new_keep in actions:
@@ -823,21 +860,35 @@ def execute_js_rich(script, driver, no_monitor=False, timeout=None):
     result = None;  error_msg = None;  reloaded = False; newTabs = []
     before_sids = set(driver.get_session_dict().keys()); response = {}
     try:
-        print(f"Executing: {script[:250]} ...")
+        _debug(f"Executing: {script[:250]} ...")
         _exec_kwargs = {}
         if timeout is not None:
             _exec_kwargs['timeout'] = timeout
         response = driver.execute_js(script, **_exec_kwargs)
         result = response['data'] if 'data' in response else response.get('result')
         if response.get('closed', 0) == 1: reloaded = True
-        time.sleep(1) 
+        if isinstance(result, str) and (
+            result.startswith("No response data")
+            or " no response in " in result
+            or "script may not have been delivered" in result
+        ):
+            error_msg = result
+            result = None
+        if not no_monitor:
+            time.sleep(1)
     except Exception as e:
         error = e.args[0] if e.args else str(e)
-        if isinstance(error, dict): error.pop('stack', None)
-        error_msg = str(error)
-        print(f"Error: {error_msg}")
+        if isinstance(error, str) and error.startswith('{') and "'message'" in error:
+            try: error = ast.literal_eval(error)
+            except Exception: pass
+        if isinstance(error, dict):
+            error.pop('stack', None)
+            error_msg = error.get('message') or str(error)
+        else:
+            error_msg = str(error)
+        _debug(f"Error: {error_msg}")
     rr = {
-        "status": "failed" if error_msg else "success",
+        "status": "error" if error_msg else "success",
         "js_return": result,
         "tab_id": driver.default_session_id
     }  

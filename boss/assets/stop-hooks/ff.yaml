@@ -1,4 +1,5 @@
 enabled: true
+# repeat: 10
 prompt: |
   Before stopping, reread the active boss plan/task state.
   If there is a safe, verifiable, requirement-anchored next action, continue with it.

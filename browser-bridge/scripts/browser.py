@@ -44,8 +44,13 @@ if _skill_dir not in sys.path:
     sys.path.insert(0, _skill_dir)
 
 
+def _debug_enabled():
+    return os.environ.get('BROWSER_BRIDGE_DEBUG', '').lower() in ('1', 'true', 'yes', 'on', 'debug')
+
+
 def main():
     parser = argparse.ArgumentParser(prog='browser', description='CS 浏览器控制 CLI')
+    parser.add_argument('--verbose', action='store_true', help='输出诊断日志到 stderr')
     sub = parser.add_subparsers(dest='cmd', required=True)
 
     p_exec = sub.add_parser('exec', help='在浏览器中执行 JavaScript')
@@ -98,12 +103,16 @@ def main():
     p_screenshot.add_argument('filepath', nargs='?', help='保存 PNG 的路径，默认自动放到临时目录')
 
     args = parser.parse_args()
+    if args.verbose:
+        os.environ['BROWSER_BRIDGE_DEBUG'] = '1'
+    debug_enabled = args.verbose or _debug_enabled()
 
-    # ── 把模块日志重定向到 stderr ─────────────────────────────────────
+    # ── 默认吞掉模块日志，确保 stdout 只输出一行 JSON ───────────────────
     # TMWebDriver 和 simphtml 会把连接日志、执行进度打印到 stdout。
-    # 这里转到 stderr，确保 stdout 只输出干净的 JSON 结果。
+    # 静默模式下把这些输出收进内存；--verbose 时转到 stderr 供排障。
     _real_stdout = sys.stdout
-    sys.stdout = sys.stderr
+    _log_stream = sys.stderr if debug_enabled else io.StringIO()
+    sys.stdout = _log_stream
     try:
         from tmwd_bridge import (
             init_browser, web_execute_js, web_scan,
@@ -137,11 +146,14 @@ def main():
             result = web_close(args.tab_id)
         elif args.cmd == 'switch':
             sid = switch_tab(args.pattern)
-            result = {'status': 'success' if sid else 'error', 'session_id': sid}
+            result = {'status': 'success', 'session_id': sid} if sid else {
+                'status': 'error',
+                'error': {'code': 'tab_not_found', 'message': f"No tab matched: {args.pattern}"}
+            }
         elif args.cmd == 'screenshot':
             result = web_screenshot(args.filepath)
     except Exception as e:
-        result = {'status': 'error', 'msg': str(e)}
+        result = {'status': 'error', 'error': {'code': 'cli_error', 'message': str(e)}}
     finally:
         sys.stdout = _real_stdout
 

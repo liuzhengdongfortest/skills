@@ -31,7 +31,9 @@ function runHook(payload) {
 }
 
 export const FFStopGate = async ({ client, directory, worktree }) => {
-  const continued = new Set();
+  const inFlight = new Set();
+  const lastContinuedAt = new Map();
+  const duplicateWindowMs = 250;
 
   return {
     event: async ({ event }) => {
@@ -42,7 +44,10 @@ export const FFStopGate = async ({ client, directory, worktree }) => {
       if (!isIdle && !isStopStep) return;
 
       const sessionID = event.properties?.sessionID || part?.sessionID;
-      if (!sessionID || continued.has(sessionID)) return;
+      if (!sessionID || inFlight.has(sessionID)) return;
+
+      const lastContinue = lastContinuedAt.get(sessionID) ?? 0;
+      if (Date.now() - lastContinue < duplicateWindowMs) return;
 
       let cwd = event.properties?.directory || directory || worktree || process.cwd();
       try {
@@ -53,17 +58,23 @@ export const FFStopGate = async ({ client, directory, worktree }) => {
         // Fall back to the plugin context directory.
       }
 
-      const result = await runHook({
-        cwd,
-        directory: cwd,
-        session_id: sessionID,
-        hook_event_name: "Stop",
-        stop_hook_active: continued.has(sessionID),
-      });
+      inFlight.add(sessionID);
+      let result;
+      try {
+        result = await runHook({
+          cwd,
+          directory: cwd,
+          session_id: sessionID,
+          hook_event_name: "Stop",
+          stop_hook_active: lastContinuedAt.has(sessionID),
+        });
+      } finally {
+        inFlight.delete(sessionID);
+      }
 
       if (result.action !== "continue" || !result.prompt) return;
 
-      continued.add(sessionID);
+      lastContinuedAt.set(sessionID, Date.now());
       await client.session.prompt({
         path: { id: sessionID },
         body: {

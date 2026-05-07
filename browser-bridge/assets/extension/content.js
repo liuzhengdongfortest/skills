@@ -6,6 +6,7 @@ document.querySelectorAll('meta[http-equiv="Content-Security-Policy"]').forEach(
 // Indicator badge at bottom-right (userscript style)
 (function(){
   if(window.self!==window.top)return;
+  if(localStorage.getItem('BROWSER_BRIDGE_BADGE') !== '1') return;
   const d=document.createElement('div');
   d.id='ljq-ind';
   d.innerText='ljq_driver: 已连接';

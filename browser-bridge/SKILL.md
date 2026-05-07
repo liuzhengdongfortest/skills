@@ -26,6 +26,7 @@ CLI (browser.py)  ->  Python (TMWebDriver)  <-WebSocket->  Chrome 扩展  <-CDP/
 - Python WebSocket server 运行在 `ws://127.0.0.1:18765`。
 - Chrome 扩展连接到 server，并把命令转发给浏览器 tab。
 - JavaScript 在页面上下文中执行；如果 CSP 阻止执行，会回退到 CDP。
+- `navigate` / `back` / `forward` / `reload` 使用 Chrome extension tab API，不通过页面内 `window.location` 注入实现。
 - 返回结果是结构化 JSON，不是原始 HTML。
 
 ## 一次性安装
@@ -41,7 +42,19 @@ pip install bs4 simple-websocket-server bottle requests
 1. 打开 Chrome 的 `chrome://extensions/`。
 2. 启用 "Developer mode / 开发者模式"。
 3. 点击 "Load unpacked / 加载已解压的扩展程序"，选择 `<skill-dir>/assets/extension/`。
-4. 打开任意网页验证：右下角应看到绿色的 `ljq_driver: connected` 标记。
+4. 打开任意网页验证：`python <skill-dir>/scripts/browser.py tabs` 能看到 tab。
+
+连接标记默认不显示，避免污染截图和页面布局。需要临时显示时，在页面控制台执行：
+
+```javascript
+localStorage.setItem('BROWSER_BRIDGE_BADGE', '1'); location.reload()
+```
+
+关闭标记：
+
+```javascript
+localStorage.removeItem('BROWSER_BRIDGE_BADGE'); location.reload()
+```
 
 ## CLI 参考
 
@@ -67,6 +80,12 @@ python <skill-dir>/scripts/browser_master.py
 
 ```bash
 python <skill-dir>/scripts/browser.py exec --no-monitor "document.title"
+```
+
+默认情况下 CLI 只在 stdout 输出一行 JSON，不输出连接、tab 更新或执行片段等诊断日志。排障时可以加全局参数 `--verbose`，或设置环境变量 `BROWSER_BRIDGE_DEBUG=1`：
+
+```bash
+python <skill-dir>/scripts/browser.py --verbose exec --no-monitor "document.title"
 ```
 
 ### exec: 在浏览器里执行 JavaScript
@@ -112,7 +131,7 @@ python <skill-dir>/scripts/browser.py exec --timeout 30 "await fetch('/api/slow'
 
 返回字段：
 
-- `status`：`success` 或 `failed`。
+- `status`：`success` 或 `error`。
 - `js_return`：JavaScript 返回值；DOM 元素会被智能处理成 `outerHTML`。
 - `diff`：DOM 变化摘要，说明哪些元素出现或改变。
 - `transients`：执行期间短暂出现的文本，例如 toast 或 loading。
@@ -121,6 +140,12 @@ python <skill-dir>/scripts/browser.py exec --timeout 30 "await fetch('/api/slow'
 - `error`：失败时的错误信息。
 - `reloaded`：执行期间页面是否发生 reload。
 - `suggestion`：页面无明显变化时给出的提示。
+
+失败时统一返回：
+
+```json
+{"status":"error","error":{"code":"execute_error","message":"..."}}
+```
 
 ### scan: 获取简化后的页面内容
 
@@ -142,7 +167,9 @@ python <skill-dir>/scripts/browser.py scan --wait ".result-card"  # 等待 SPA �
 - `url` / `tab_id`：当前 tab 信息。
 - `sessions`：所有 tab 的 id、url、title 列表。
 - `size`：内容字符数，仅 `size-only` 返回。
-- `msg`：失败时的错误信息。
+- `scan.truncated`：返回内容是否经过预算截断。
+- `scan.original_size` / `scan.final_size`：截断前后字符数。
+- `error`：失败时的 `{code,message}`。
 
 ### tabs: 列出所有浏览器 tab
 
@@ -150,6 +177,8 @@ python <skill-dir>/scripts/browser.py scan --wait ".result-card"  # 等待 SPA �
 python <skill-dir>/scripts/browser.py tabs
 # -> {"status":"success","sessions":[{"id":"123","url":"https://...","title":"..."},...]}
 ```
+
+`tabs` 只返回可操作的 tab 信息，不返回 `connected_at`、内部连接类型等调试字段。
 
 ### navigate: 打开 URL
 

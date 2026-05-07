@@ -1,4 +1,4 @@
-import json, threading, time, uuid, queue, socket, requests, traceback, sys
+import json, threading, time, uuid, queue, socket, requests, traceback, sys, os
 from typing import Dict, Any, Optional, List  
 from simple_websocket_server import WebSocketServer, WebSocket  
 from bs4 import BeautifulSoup  
@@ -6,8 +6,13 @@ import bottle, random
 from bottle import route, template, request, response
 
 
+def _debug_enabled():
+    return os.environ.get('BROWSER_BRIDGE_DEBUG', '').lower() in ('1', 'true', 'yes', 'on', 'debug')
+
+
 def _log(*args, **kwargs):
-    print(*args, file=sys.stderr, **kwargs)
+    if _debug_enabled():
+        print(*args, file=sys.stderr, **kwargs)
 
 class Session:
     def __init__(self, session_id, info, client=None):
@@ -73,7 +78,8 @@ class TMWebDriver:
                 try:
                     msg = msgQ.get(timeout=0.2)
                     try: self.acks[json.loads(msg).get('id','')] = True
-                    except: traceback.print_exc()
+                    except:
+                        if _debug_enabled(): traceback.print_exc()
                     return msg
                 except queue.Empty: continue
             return json.dumps({"id": "", "ret": "next long-poll"})
@@ -284,10 +290,21 @@ class TMWebDriver:
         _log(f"成功设置默认会话: {self.default_session_id}: {info['url']}")  
         return self.default_session_id  
     
-    def jump(self, url, timeout=15): return self.execute_js(f"window.location.href='{url}'", timeout=timeout)
-    def back(self, timeout=15): return self.execute_js("window.history.back()", timeout=timeout)
-    def forward(self, timeout=15): return self.execute_js("window.history.forward()", timeout=timeout)
-    def reload(self, timeout=15): return self.execute_js("window.location.reload()", timeout=timeout)
+    def jump(self, url, timeout=15):
+        import json as _json
+        return self.execute_js(_json.dumps({"cmd": "tabs", "method": "navigate", "url": url}), timeout=timeout)
+
+    def back(self, timeout=15):
+        import json as _json
+        return self.execute_js(_json.dumps({"cmd": "tabs", "method": "back"}), timeout=timeout)
+
+    def forward(self, timeout=15):
+        import json as _json
+        return self.execute_js(_json.dumps({"cmd": "tabs", "method": "forward"}), timeout=timeout)
+
+    def reload(self, timeout=15):
+        import json as _json
+        return self.execute_js(_json.dumps({"cmd": "tabs", "method": "reload"}), timeout=timeout)
 
     def newtab(self, url=None):
         if url is None: url = "about:blank"

@@ -1,11 +1,26 @@
 #!/usr/bin/env node
+import crypto from "node:crypto";
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 
 const TRUE_VALUES = new Set(["1", "true", "yes", "on", "y", "enabled", "enable"]);
 const FALSE_VALUES = new Set(["0", "false", "no", "off", "n", "disabled", "disable"]);
 const ENABLE_KEYS = ["enabled", "enable", "active", "on", "switch", "开关"];
 const PROMPT_KEYS = ["prompt", "reason", "message", "提示"];
+const REPEAT_KEYS = ["repeat", "reentry", "allow_reentry"];
+const REPEAT_COUNT_KEYS = [
+  "repeat_count",
+  "repeat_times",
+  "repeat_limit",
+  "max_repeats",
+  "max_repeat",
+  "times",
+  "count",
+  "次数",
+  "重复次数",
+];
+const STATE_TTL_MS = 24 * 60 * 60 * 1000;
 
 function readStdin() {
   return new Promise((resolve) => {
@@ -141,11 +156,125 @@ function boolValue(value) {
   return false;
 }
 
+function intValue(value) {
+  if (typeof value === "number" && Number.isFinite(value)) return Math.trunc(value);
+  if (typeof value !== "string") return null;
+
+  const normalized = value.trim();
+  if (!/^-?\d+$/.test(normalized)) return null;
+  return Number.parseInt(normalized, 10);
+}
+
 function firstPresent(record, keys) {
   for (const key of keys) {
     if (Object.prototype.hasOwnProperty.call(record, key)) return record[key];
   }
   return undefined;
+}
+
+function repeatLimit(parsed) {
+  const count = intValue(firstPresent(parsed, REPEAT_COUNT_KEYS));
+  if (count !== null) return Math.max(0, count);
+
+  const repeat = firstPresent(parsed, REPEAT_KEYS);
+  const repeatNumber = intValue(repeat);
+  if (repeatNumber !== null) return Math.max(0, repeatNumber);
+  if (boolValue(repeat)) return Infinity;
+  return 1;
+}
+
+function stateFilePath() {
+  return process.env.FF_STOP_HOOK_STATE || path.join(os.homedir(), ".ai-hooks", "ff-stop-state.json");
+}
+
+function readState() {
+  try {
+    return JSON.parse(fs.readFileSync(stateFilePath(), "utf8"));
+  } catch {
+    return { entries: {} };
+  }
+}
+
+function writeState(state) {
+  const file = stateFilePath();
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  fs.writeFileSync(file, `${JSON.stringify(state, null, 2)}\n`, "utf8");
+}
+
+function pruneState(state, now) {
+  state.entries ??= {};
+  for (const [key, entry] of Object.entries(state.entries)) {
+    if (!entry || typeof entry.updatedAt !== "number" || now - entry.updatedAt > STATE_TTL_MS) {
+      delete state.entries[key];
+    }
+  }
+}
+
+function sessionIdentity(input) {
+  return (
+    input.session_id ||
+    input.sessionID ||
+    input.sessionId ||
+    input.conversation_id ||
+    input.conversationID ||
+    input.transcript_path ||
+    input.transcriptPath ||
+    null
+  );
+}
+
+function stateKey(input, file) {
+  const session = sessionIdentity(input);
+  if (!session) return null;
+
+  let fileStamp = "";
+  try {
+    fileStamp = String(Math.trunc(fs.statSync(file).mtimeMs));
+  } catch {
+    // The file path is already part of the key, so missing stat data can be tolerated.
+  }
+
+  return crypto
+    .createHash("sha256")
+    .update(`${file}\0${fileStamp}\0${session}`)
+    .digest("hex");
+}
+
+function evaluateCount(input, file, maxContinues) {
+  if (maxContinues === Infinity) return { action: "continue", repeat: true };
+  if (maxContinues <= 0) return { action: "allow", file, maxContinues, limitReached: true };
+
+  const key = stateKey(input, file);
+  if (!key) {
+    const stopHookActive = input.stop_hook_active === true || input.stop_hook_active === "true";
+    if (stopHookActive) return { action: "allow", file, maxContinues, alreadyActive: true };
+    return { action: "continue", maxContinues, count: 1, remaining: Math.max(0, maxContinues - 1) };
+  }
+
+  const now = Date.now();
+  const state = readState();
+  pruneState(state, now);
+
+  const current = state.entries[key]?.count ?? 0;
+  if (current >= maxContinues) {
+    writeState(state);
+    return { action: "allow", file, maxContinues, count: current, limitReached: true };
+  }
+
+  const count = current + 1;
+  state.entries[key] = {
+    count,
+    file,
+    updatedAt: now,
+  };
+  writeState(state);
+
+  return {
+    action: "continue",
+    maxContinues,
+    count,
+    remaining: Math.max(0, maxContinues - count),
+  };
 }
 
 function evaluate(input) {
@@ -162,13 +291,15 @@ function evaluate(input) {
 
   const enabled = boolValue(firstPresent(parsed, ENABLE_KEYS));
   const prompt = String(firstPresent(parsed, PROMPT_KEYS) ?? "").trim();
-  const repeat = boolValue(parsed.repeat ?? parsed.reentry ?? parsed.allow_reentry);
-  const stopHookActive = input.stop_hook_active === true || input.stop_hook_active === "true";
+  const maxContinues = repeatLimit(parsed);
 
   if (!enabled || !prompt) return { action: "allow", file };
-  if (stopHookActive && !repeat) return { action: "allow", file, alreadyActive: true };
 
-  return { action: "continue", prompt, file, repeat };
+  return {
+    ...evaluateCount(input, file, maxContinues),
+    prompt,
+    file,
+  };
 }
 
 const input = parseJson(await readStdin());
