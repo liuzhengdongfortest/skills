@@ -84,14 +84,14 @@ description: 用户是老板，我是助手管家——用开会的方式把项�
 
 两步判断：
 
-1. `.boss/` 在不在？不在且有代码 → [`path-c-onboard.md`](path-c-onboard.md)
+1. `.boss/` 在不在？不在 → [`paths/c-onboard.md`](paths/c-onboard.md)
 2. 老板在干什么？
-   - 求知 → [`path-d-learn.md`](path-d-learn.md)
-   - 讨论 → [`path-a-meeting.md`](path-a-meeting.md)
-   - 长期目标、阶段推进、plans/tasks 执行 → [`path-e-plan-execution.md`](path-e-plan-execution.md)，硬规则见 [`path-e-guardrails.md`](path-e-guardrails.md)
-   - 命令 → [`path-b-direct.md`](path-b-direct.md)
+   - 求知 → [`paths/d-learn.md`](paths/d-learn.md)
+   - 讨论 → [`paths/a-meeting.md`](paths/a-meeting.md)
+   - 长期目标、阶段推进、plans/tasks 执行 → [`paths/e-plan-execution.md`](paths/e-plan-execution.md)，硬规则见 [`paths/e-guardrails.md`](paths/e-guardrails.md)
+   - 命令 → [`paths/b-direct.md`](paths/b-direct.md)
 
-不确定时默认走路径 A。所有路径共享[五个操作](operations.md)。
+不确定时默认走路径 A。所有路径共享[五个操作](core/operations.md)。
 
 ## 启动纪律
 
@@ -102,7 +102,7 @@ description: 用户是老板，我是助手管家——用开会的方式把项�
 
 这只是基础上下文，不是全部上下文。进入路径 E、写代码、落架构或处理任务时，继续读取相关 `.boss/requirements/` 和 `.boss/architecture/`。长期计划以用户需求为锚点，不能只看 plans/tasks 自转。
 
-路径 E 的主文档是执行者手册，先决定怎么推进；`path-e-guardrails.md` 是护栏，用来防止破坏 plan/task/requirements 边界。不要把执行轮次变成审计报告。
+路径 E 的主文档是执行者手册，先决定怎么推进；`paths/e-guardrails.md` 是护栏，用来防止破坏 plan/task/requirements 边界。不要把执行轮次变成审计报告。
 
 ## 目录约定
 
@@ -114,11 +114,11 @@ requirements/    architecture/    meetings/
 plans/           tasks/
 ```
 
-requirements 和 architecture 是一等公民——只有它们绑定代码，传导链也只在这两层生效。requirements 只记录用户需求、范围和验收，不承载计划、任务或实现路线；plan 可以列待执行条目，但 task 文档只在真正执行该条目时创建；task 是 `.boss/tasks/.../task.md` 文档，不是一行 markdown 待办；单个 active plan 不能超过 200 行，超过必须压缩；领域模式、wiki、plans、tasks 的详细规矩见 [`domains.md`](domains.md)。
+requirements 和 architecture 是一等公民——只有它们绑定代码，传导链也只在这两层生效。requirements 只记录用户需求、范围和验收，不承载计划、任务或实现路线；plan 可以列待执行条目，但 task 文档只在真正执行该条目时创建；task 是 `.boss/tasks/.../task.md` 文档，不是一行 markdown 待办；单个 active plan 不能超过 200 行，超过必须压缩；领域模式、wiki、plans、tasks 的详细规矩见 [`core/domains.md`](core/domains.md)。
 
 ## 传导链
 
-需求变了 → 架构失效 → 代码跟着变 → sync 任务追踪。详细机制见 [`conduction.md`](conduction.md)。
+需求变了 → 架构失效 → 代码跟着变 → sync 任务追踪。详细机制见 [`core/conduction.md`](core/conduction.md)。
 
 ## 技能自进化
 

@@ -11,7 +11,7 @@
 
 路径 E 的角色是**选手**：读取当前状态，选一个安全、可验证、需求锚定的动作，直接推进。
 
-硬规则不在这里展开，见 [`path-e-guardrails.md`](path-e-guardrails.md)。执行时要遵守那些规则，但不要把本轮变成审计报告；规则是护栏，不是交付物。
+硬规则不在这里展开，见 [`e-guardrails.md`](e-guardrails.md)。执行时要遵守那些规则，但不要把本轮变成审计报告；规则是护栏，不是交付物。
 
 ## 核心模型
 
@@ -30,7 +30,7 @@ plan 是控制面板，写长期目标、阶段框架、当前阶段、待执行
 3. `.boss/architecture/OVERVIEW.md` 和相关架构决策
 4. `.boss/plans/INDEX.md` 和唯一 active plan
 5. `.boss/tasks/INDEX.md`
-6. [`path-e-guardrails.md`](path-e-guardrails.md)
+6. [`e-guardrails.md`](e-guardrails.md)
 
 如果 active plan 超过 200 行，先压缩。压缩只保留当前可操作状态，旧流水账可以丢；具体执行细节由 task 文档和交付物承载。
 

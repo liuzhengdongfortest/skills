@@ -2,7 +2,7 @@
 
 这份文档是路径 E 的护栏。它负责回答“什么不能破坏”，不是替代执行。
 
-执行者先看 [`path-e-plan-execution.md`](path-e-plan-execution.md) 决定怎么推进，再用这里做自检。不要把本文件改造成每轮审计报告。
+执行者先看 [`e-plan-execution.md`](e-plan-execution.md) 决定怎么推进，再用这里做自检。不要把本文件改造成每轮审计报告。
 
 ## Plan 护栏
 
