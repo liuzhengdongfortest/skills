@@ -69,6 +69,8 @@ python tools/mc-cli.py window --all   # 显示所有注册的 .boss root
 
 常驻执行的 prompt 必须和当前进度解耦。它应该描述“每轮如何重新读取状态、选择下一个动作、更新文档和验证”，而不是写死某个阶段、某个 task 编号或某个临时结论。MC Core 会复用同一 prompt；如果 prompt 里包含进度快照，阶段推进后会反复把 Agent 拉回旧状态。
 
+如果 prompt 涉及 imboss 路径 E，必须明确：planning 只在 plan 里列待执行条目，不批量创建 task 文档；Agent 真正选择某个条目开工时，才创建 `.boss/tasks/.../task.md`，并更新 plan 与 `tasks/INDEX.md`。不要让 Agent 把 task 主体写成 active plan 里的一行 markdown 待办。
+
 ```bash
 # 示例 1：只做 code review
 python tools/mc-cli.py start \
@@ -79,7 +81,7 @@ python tools/mc-cli.py start \
 python tools/mc-cli.py start \
   --provider claude \
   --skill imboss \
-  --prompt "按 imboss 路径 E 执行：每轮重新读取 .boss/CONVENTIONS.md、.boss/PROFILE.md、.boss/plans/INDEX.md、唯一 active plan、相关 requirements、architecture 和 tasks；确认 active plan 不超过 200 行；基于当前文档状态选择下一个最小可验证动作，执行、验证并更新 active plan/tasks/交付物。不要依赖启动时的旧进度快照。"
+  --prompt "按 imboss 路径 E 执行：每轮重新读取 .boss/CONVENTIONS.md、.boss/PROFILE.md、.boss/plans/INDEX.md、唯一 active plan、相关 requirements、architecture 和 .boss/tasks/INDEX.md；确认 active plan 不超过 200 行；基于当前文档状态选择下一个最小可验证 plan 条目。若该条目还没有 task 文档，先创建 .boss/tasks/.../task.md，并更新 plan 与 tasks/INDEX.md；task 执行记录使用 YYYY-MM-DDTHH:mm:ss+08:00 时间戳。然后执行、验证并更新 task/active plan/交付物。不要在规划阶段批量预建 task 文档，不要依赖启动时的旧进度快照。"
 
 # 示例 3：只生成文档
 python tools/mc-cli.py start \

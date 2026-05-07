@@ -67,7 +67,7 @@ VISION.md 是入口，子文档用用户故事组织。推荐格式：
 
 ## plans：目标的框架
 
-计划和任务之间：目标 → 阶段框架（粗线条）→ 关联 task。
+计划和任务之间：目标 → 阶段框架（粗线条）→ 当前阶段待执行条目 → 执行时创建 task 文档。
 
 plans 是工作面板，不是日志仓库。单个 plan 文件硬上限 200 行；超过就必须先压缩，再继续执行或汇报。
 
@@ -78,9 +78,10 @@ plans 是工作面板，不是日志仓库。单个 plan 文件硬上限 200 行
 ## 框架
 阶段 1: ... → 阶段 2: ... → 阶段 3: ...
 ## 当前
-在阶段 X，task-XX 进行中
+在阶段 X，当前 task-XX 进行中
 ## 关联任务
-- [ ] task-xxx — 简述 — 状态
+- [ ] Task A — planned
+- [ ] [Task B](../tasks/YYYY-MM-DD-xxx/task.md) — active
 ```
 
 执行中不断完善。完成标 `status: done`。
@@ -97,12 +98,18 @@ plans 是工作面板，不是日志仓库。单个 plan 文件硬上限 200 行
 
 ## tasks：状态式 + 自动归档
 
+task 是文档，不是一行 markdown 待办。plan 只能列待执行条目或索引已创建 task，不能承载 task 本体。
+
+不要在规划阶段批量创建 task 文档。只有当助手真正选择某个 plan 条目开始执行时，才创建对应 `.boss/tasks/YYYY-MM-DD-描述/task.md`，并更新 plan 与 `tasks/INDEX.md`。
+
 task type 自由字段，不预枚举。大部分只要 `task.md`，需更多文件时才加（sync 带 migration.md + proposals/，research 带 notes.md）。
+
+task 的执行记录必须能稳定排序。记录条目用 `YYYY-MM-DDTHH:mm:ss+08:00`，不要只写日期；同一秒多条时追加毫秒或序号。
 
 ```
 tasks/
-  INDEX.md              # 活跃任务
-  YYYY-MM-DD-描述/       # 进行中
+  INDEX.md              # 已创建且仍活跃的任务
+  YYYY-MM-DD-描述/       # 进行中；执行时才创建
   _resolved/YYYY-MM/    # 已完成，按月归档
 ```
 

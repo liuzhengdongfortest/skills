@@ -15,7 +15,9 @@
 
 **一个长期目标 = 一个 active 大 plan。**
 
-大 plan 里写完整长期路线，但只细拆当前阶段 tasks。执行过程中持续细化、改写、删除、重排 tasks。阶段完成后，再拆下一阶段。
+大 plan 里写完整长期路线，但只细拆当前阶段的待执行条目。规划阶段只在 plan 里列条目，不批量创建 `.boss/tasks/` 文档。助手真正选择某个条目开始执行时，才创建 `.boss/tasks/.../task.md`，并把 plan 中的条目更新为 task 链接或附上 task 链接。
+
+task 是文档，不是一行 markdown 待办。plan 只保留当前阶段条目、已创建 task 的链接、顺序和状态摘要。执行过程中持续细化、改写、删除、重排 task 文档和 plan 索引。阶段完成后，再拆下一阶段条目。
 
 不要提前把未来阶段拆成很多 active plan 文件，那会制造文档堆，不会提高执行力。
 
@@ -30,7 +32,7 @@
 规则：
 
 - 每个 active plan 必须写清楚它服务哪些需求故事或用户目标
-- 每个当前阶段 task 必须能追溯到需求锚点
+- 每个当前阶段待执行条目必须能追溯到需求锚点；真正开工后，需求锚点写入对应 task 文档
 - 执行中发现阶段设计错了，可以改阶段；但要在执行记录里说明为什么更贴近需求
 - 如果用户需求本身变了，先更新 requirements，再更新 plan/tasks
 - 如果 requirements 缺失或太旧，先补需求，不要直接靠 plan 开工
@@ -44,12 +46,12 @@
 2. 读 `.boss/requirements/VISION.md` 和与目标相关的需求故事
 3. 读 `.boss/architecture/OVERVIEW.md` 和与目标相关的架构决策
 4. 检查 `.boss/plans/INDEX.md` 和现有 active plan
-5. 检查 active plan 里当前阶段 tasks 是否存在
+5. 检查 active plan 是否列出当前阶段待执行条目；`.boss/tasks/INDEX.md` 只索引已经创建且仍活跃的 task 文档
 6. 检查 active plan 是否超过 200 行；超过则先压缩
 
 如果没有 active plan，先建一个大 plan。  
 如果有多个 active plan，先收敛成一个主 plan，旧计划标 `done`、`paused` 或合并进主 plan。  
-如果主 plan 没有当前阶段 tasks，先在 plan 内拆当前阶段 tasks。
+如果主 plan 没有当前阶段待执行条目，先在 plan 内拆条目，不要预建 task 文档。
 如果需求文档不存在、过旧或与老板当前目标冲突，切回路径 A 先聊清楚，再执行[落需求](operations.md#落需求)。
 
 内部 `update_plan` 只能当临时工作记忆，不能替代 `.boss/plans/`。
@@ -75,7 +77,7 @@
 - 计划原则
 - 总体框架的当前有效版本
 - 当前阶段说明
-- 当前阶段未完成 tasks
+- 当前阶段未完成条目、已创建 task 文档链接和状态摘要
 - 完成标准
 - 最近 3 条以内关键执行记录；没有新决策时可以不保留执行记录
 
@@ -130,13 +132,12 @@ updated: YYYY-MM-DD
 当前处于哪个阶段，为什么。
 
 ## 阶段 N Tasks
-- [ ] Task 1：...
-  - 目标：
-  - 需求锚点：
-  - 验收：
+- [ ] Task 1：一句话待执行条目 — planned
+- [ ] Task 2：一句话待执行条目 — planned
+- [ ] [Task 3：已开工条目](../tasks/YYYY-MM-DD-xxx/task.md) — active
 
 ## 阶段 N 执行记录
-- YYYY-MM-DD：发现、决策、调整。
+- YYYY-MM-DDTHH:mm:ss+08:00：发现、决策、调整。
 
 ## 后续阶段占位
 未来阶段暂不细拆，等当前阶段完成后再拆。
@@ -147,18 +148,61 @@ updated: YYYY-MM-DD
 
 ## 如何拆当前阶段 tasks
 
-task 写在当前 active plan 里，不急着创建很多任务目录。
+规划阶段先在 active plan 里列当前阶段待执行条目，不要批量创建 task 文档。
 
-拆 task 的原则：
+task 必须在真正执行时创建为 `.boss/tasks/YYYY-MM-DD-描述/task.md` 文档。active plan 不是 task 本体，只是条目索引和当前状态面板。
 
-- 一个 task 应该能被一次执行周期推进到可验证结果
-- task 必须有目标和验收
-- task 必须写清楚需求锚点；没有锚点就先补需求或删掉
-- task 可以在执行中被拆细、合并、删除或改顺序
-- 发现新问题时，直接更新当前 plan 的 task 列表和执行记录
+一行 markdown checkbox 只能做索引，不能承载 task。原因很简单：task 需要目标、需求锚点、范围、验收、验证、阻塞和执行记录；这些内容塞进 plan 会让 plan 膨胀，也会让任务无法独立归档。
+
+拆 plan 条目的原则：
+
+- 一个条目应该能被一次执行周期推进到可验证结果
+- 条目只写标题和一句状态摘要；不要写目标、范围、验收、验证、执行记录
+- 条目必须能追溯到需求锚点；如果需求锚点不清楚，先补需求或删掉
+- task 文档可以在执行中被拆细、合并、删除或改顺序
+- 发现新问题时，更新 task 文档；如果影响阶段排序或状态，再更新当前 plan 的 task 索引
 - 不要把未来阶段的 task 提前拆得很细
 
-只有当 task 需要较长执行记录、附属材料、migration 或归档时，才在 `.boss/tasks/YYYY-MM-DD-xxx/` 下建 task 目录。
+执行者选择某个条目开工时：
+
+1. 为该条目创建 `.boss/tasks/YYYY-MM-DD-描述/task.md`
+2. 把目标、需求锚点、范围、验收、验证写入 task 文档
+3. 在 `.boss/tasks/INDEX.md` 增加该活跃 task
+4. 把 plan 中对应条目更新为 task 链接或附上 task 链接
+5. 再开始执行
+
+task 的执行记录必须用可排序时间戳，而不是只写日期。推荐格式：`YYYY-MM-DDTHH:mm:ss+08:00`。如果同一秒内需要写多条，追加毫秒或序号，如 `2026-05-07T18:42:13.001+08:00`。
+
+task 文档推荐结构：
+
+```md
+---
+status: pending
+created: YYYY-MM-DD
+updated: YYYY-MM-DD
+plan: ../plans/xxx.md
+---
+
+# Task：一句话
+
+## 目标
+要推进到什么可验证状态。
+
+## 需求锚点
+引用 requirements 或用户目标。
+
+## 范围
+本 task 做什么，不做什么。
+
+## 验收
+完成时必须看到什么证据。
+
+## 验证
+要跑哪些测试、样本、截图、trace 或人工检查。
+
+## 执行记录
+- YYYY-MM-DDTHH:mm:ss+08:00：...
+```
 
 ## 执行循环
 
@@ -169,13 +213,13 @@ task 写在当前 active plan 里，不急着创建很多任务目录。
 每轮执行按这个顺序：
 
 1. 读需求锚点，确认当前阶段仍然服务这些需求
-2. 读 active plan 的“当前”和当前阶段 tasks
-3. 选择下一个最小可验证 task
-4. 在 plan 的执行记录里写一句将要推进什么，以及服务哪个需求
+2. 读 active plan 的“当前”和当前阶段条目；如果条目已有 task 链接，再打开对应 task 文档
+3. 选择下一个最小可验证条目；若还没有 task 文档，先按上面的规则即时创建
+4. 在 task 文档的执行记录里用时间戳写一句将要推进什么，以及服务哪个需求；plan 只记录重要状态变化
 5. 执行任务
 6. 跑实际验证：测试、构建、样本、竞品对比、截图、trace，按任务需要选择
 7. 把验证结果和证据路径写回 plan
-8. 勾掉完成 task，或根据发现改写 task
+8. 更新 task 文档状态；完成后归档到 `.boss/tasks/_resolved/YYYY-MM/`，并更新 plan 和 tasks index
 9. 如果当前阶段偏离需求，先调整阶段和 tasks，再继续
 10. 如果当前阶段 tasks 全部完成，补阶段总结，再拆下一阶段 tasks
 
@@ -227,13 +271,15 @@ task 写在当前 active plan 里，不急着创建很多任务目录。
 
 ## 和 tasks 目录的关系
 
-`.boss/tasks/` 是状态式任务库，不是所有 checkbox 的镜像。
+`.boss/tasks/` 是状态式任务库。task 是文档，不是一行 checkbox，也不是规划阶段批量生成的占位目录。
 
 使用规则：
 
-- 简单 task：留在 active plan 内
-- 长 task：建 `.boss/tasks/YYYY-MM-DD-任务名/task.md`
-- 完成后：移动到 `.boss/tasks/_resolved/YYYY-MM/`
+- 规划时：只在 plan 里列待执行条目
+- 开工时：为被选中的条目创建 `.boss/tasks/YYYY-MM-DD-任务名/task.md`
+- plan：只保留条目、已创建 task 链接、顺序和状态摘要
+- `.boss/tasks/INDEX.md`：只放已经创建且仍活跃的 task 索引
+- 完成后：移动整个 task 目录到 `.boss/tasks/_resolved/YYYY-MM/`
 - `.boss/tasks/INDEX.md` 只放活跃任务索引，保持清爽
 
 ## 禁止项
@@ -243,6 +289,8 @@ task 写在当前 active plan 里，不急着创建很多任务目录。
 - 禁止把阶段当成锚点，忽略用户需求
 - 禁止需求缺失或过期时直接执行 plan
 - 禁止把阶段计划、task 列表、技术路线塞进 requirements
+- 禁止在规划阶段批量预建 task 文档
+- 禁止把 task 本体写成 active plan 里的一行 markdown 待办
 - 禁止只用内部 plan，不更新 `.boss/plans`
 - 禁止事后一次性补账伪装成执行中维护
 - 禁止没有验证证据就汇报阶段完成

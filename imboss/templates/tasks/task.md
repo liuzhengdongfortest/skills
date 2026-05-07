@@ -2,6 +2,7 @@
 type:
 status: active            # active | done
 created: YYYY-MM-DD
+updated: YYYY-MM-DDTHH:mm:ss+08:00
 ---
 
 # 任务：做什么
@@ -24,7 +25,9 @@ created: YYYY-MM-DD
 
 ## 记录
 
-（执行过程中的关键节点）
+- YYYY-MM-DDTHH:mm:ss+08:00：执行过程中的关键节点
+
+记录必须带可排序时间戳，不能只写日期；同一秒多条时追加毫秒或序号，如 `2026-05-07T18:42:13.001+08:00`。
 
 ## 结论
 

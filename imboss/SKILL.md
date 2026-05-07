@@ -1,6 +1,6 @@
 ---
 name: imboss
-description: 我是老板——用开会的方式把项目聊清楚。需求、架构、决策，一件事一件事聊透，自动归档为可读的项目文档。
+description: 我是老板——用开会的方式把项目聊清楚。需求、架构、决策，一件事一件事聊透；长期目标用 plan 控盘，plan 先列执行条目，真正开工时再创建 .boss/tasks/.../task.md。
 ---
 
 # imboss
@@ -28,6 +28,22 @@ description: 我是老板——用开会的方式把项目聊清楚。需求、�
 3. 建计划 → 拆任务 → 排队执行，执行中持续完善细节
 4. 遇阻换道——阻塞点记下来，不让它卡住整体进程；除非老板明确暂停，或没有任何安全可做的事，否则继续推进同一目标下其他工作
 5. 完成汇报——干完了告诉老板做了什么、可改进的地方、意外发现
+
+## Plan / Task 分工
+
+不要把 task 劣化成一行 markdown 待办。
+
+**Plan 是控制面板，task 是任务文档。**
+
+- plan 写长期目标、阶段框架、当前阶段、待执行条目、已创建 task 的链接、顺序和状态摘要
+- 规划阶段只在 plan 里列条目，不批量创建 `.boss/tasks/` 文档
+- 助手真正选择某个 plan 条目开始执行时，才创建 `.boss/tasks/YYYY-MM-DD-描述/task.md`
+- task 文档创建后，把 plan 里的对应条目更新为 task 链接或附上 task 链接
+- plan 里的 checkbox 只能是 task 标题、状态摘要或 task 引用，不能承载目标、范围、验收、验证、执行记录
+- 任何正在执行、需要目标、需求锚点、范围、验收、验证或执行记录的事项，都必须升级为 task 文档
+- task 执行记录必须用可排序时间戳，格式 `YYYY-MM-DDTHH:mm:ss+08:00`；同一秒多条时追加 `.001`、`.002`
+- 发现 active plan 里出现大段 task 正文时，先迁移到 `.boss/tasks/`，再继续执行
+- task 完成后移动整个目录到 `.boss/tasks/_resolved/YYYY-MM/`，同时更新 plan 和 `.boss/tasks/INDEX.md`
 
 ## 实践出真知
 
@@ -84,7 +100,7 @@ requirements/    architecture/    meetings/
 plans/           tasks/
 ```
 
-requirements 和 architecture 是一等公民——只有它们绑定代码，传导链也只在这两层生效。requirements 只记录用户需求、范围和验收，不承载计划、任务或实现路线；单个 active plan 不能超过 200 行，超过必须压缩；领域模式、wiki、plans、tasks 的详细规矩见 [`domains.md`](domains.md)。
+requirements 和 architecture 是一等公民——只有它们绑定代码，传导链也只在这两层生效。requirements 只记录用户需求、范围和验收，不承载计划、任务或实现路线；plan 可以列待执行条目，但 task 文档只在真正执行该条目时创建；task 是 `.boss/tasks/.../task.md` 文档，不是一行 markdown 待办；单个 active plan 不能超过 200 行，超过必须压缩；领域模式、wiki、plans、tasks 的详细规矩见 [`domains.md`](domains.md)。
 
 ## 传导链
 
@@ -104,10 +120,10 @@ AI 发现模式反复出现、现有指令覆盖不到，主动提议更新技�
 
 ```bash
 # 启动 MC Core，每轮自动加载 imboss；具体工作指令由启动 prompt 明确给出
-python tools/mc-cli.py start --provider claude --skill imboss --prompt "按 imboss 路径 E 执行：每轮重新读取 .boss/plans/INDEX.md、唯一 active plan、相关 requirements、architecture 和 tasks；根据当前文档状态选择下一个最小可验证动作，执行、验证并更新文档。不要依赖启动时的旧进度快照。"
+python tools/mc-cli.py start --provider claude --skill imboss --prompt "按 imboss 路径 E 执行：每轮重新读取 .boss/plans/INDEX.md、唯一 active plan、相关 requirements、architecture 和 .boss/tasks/INDEX.md；根据当前文档状态选择下一个最小可验证 plan 条目。若该条目还没有 task 文档，先创建 .boss/tasks/.../task.md 并更新 plan/tasks 索引；然后执行、验证并更新文档。plan 只维护条目、task 链接、顺序和状态摘要；不要依赖启动时的旧进度快照。"
 
 # 自定义推进提示词
-python tools/mc-cli.py start --provider claude --skill imboss --prompt "按 imboss 路径 E 持续推进当前唯一 active plan；每轮自行判断当前阶段和下一个 task，不能写死阶段或 task 编号。"
+python tools/mc-cli.py start --provider claude --skill imboss --prompt "按 imboss 路径 E 持续推进当前唯一 active plan；每轮自行判断当前阶段和下一个 plan 条目，真正开工时再创建 task 文档，不能在规划阶段批量预建 tasks。"
 
 # 查看 / 暂停 / 继续 / 停止
 python tools/mc-cli.py status
