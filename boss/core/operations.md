@@ -7,7 +7,7 @@
 触发："记一下""记录""存档""存一下"
 
 1. 在 `.boss/meetings/` 下创建 `YYYY-MM-DD-主题/` 目录
-2. 生成 notes.md / decisions.md / action-items.md
+2. 生成 notes.md / decisions.md；行动项不在会议目录里单列文件，大方向关联到 roadmaps/，具体任务由用户触发创建 tasks/
 3. 展示确认后落盘
 4. 记的是原始讨论素材，不是正式文档
 

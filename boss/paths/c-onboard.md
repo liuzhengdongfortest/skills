@@ -62,7 +62,7 @@
 
 讨论后确认的差距，创建 Roadmap 或 task 追踪：
 - 需要分阶段推进的 → 创建 Roadmap，列待执行条目
-- 单个可独立完成但还没开工的 → 先放进 Roadmap 或 meeting action-items；真正选择开工时再创建 task 文档
+- 单个可独立完成但还没开工的 → 先放进 Roadmap；真正选择开工时再创建 task 文档
 - 单个可独立完成且马上执行的 → 创建 task 文档并执行、验证、归档
 - 不确定要不要改的 → 先记入 meetings，后续再定
 
