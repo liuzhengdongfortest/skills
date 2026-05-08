@@ -185,7 +185,7 @@ Roadmap 是大目标的长期控制面板，用来先暴露阶段地图，再逐
 高频实践指南：
 
 - [Roadmap 质量](guides/roadmap-quality.md)：写长期路线图时把产品、工程、设计、验证、交付和风险想全。
-- [牛马模式设计原则](guides/continuation-policy.md)：维护 stop hook 行为时参考；真正给执行 AI 的内容必须是直接动作指令。
+- [牛马模式执行规程](guides/ff-execution.md)：stop hook 触发时执行 AI 要读的停止前检查和继续执行规则。
 - [执行中发现问题](guides/execution-discovery.md)：执行阶段持续观察，能修则修，不能修则归档或建任务。
 - [工程治理](guides/engineering-governance.md)：结构变坏、临时方案变正式方案、大脚本堆、新业务逻辑放置等场景怎么处理。
 - [工作区清理](guides/worktree-cleanup.md)：每轮 task 结束如何处理 commit、漏文件和残留脏工作区。
@@ -203,8 +203,7 @@ Roadmap 是大目标的长期控制面板，用来先暴露阶段地图，再逐
 
 ### 架构参与度
 
-抛球，看老板接不接。
-
+抛出疑问，判断老板的类型，从而动态调整参与度：
 - 不关心架构：给稳妥默认方案，一句话带过。
 - 有技术判断力：给选项和 tradeoff。
 - 深度参与：完整展开设计空间，逐项讨论。
@@ -215,13 +214,15 @@ AI 发现模式反复出现、现有指令覆盖不到，要主动提议更新�
 
 更新技能本体时遵守 [信息组织指南](guides/information-architecture.md)：`SKILL.md` 放原则和地图，细则拆到 guides/paths/core/references。
 
-### 牛马模式 / 停止前执行检查
+### 牛马模式
 
-当老板提到牛马模式、`.ai/ff.yaml`、不要太早停，或要加最后一道“继续做完再停”的检查时，读 [牛马模式设计原则](guides/continuation-policy.md) 和 [牛马模式执行指令](references/stop-hooks.md)。
+当老板提到按照牛马模式执行时，要读 [牛马模式执行规程](guides/ff-execution.md)，然后按规程决定继续做什么。
+
+只有在编写、调整 `.ai/ff.yaml` prompt 时，才读 [牛马模式 prompt 接入说明](references/stop-hooks.md)。
 
 只有老板要求安装、更新、排查 stop hook 时，才读 [牛马模式安装手册](references/stop-hooks-installation.md)。
 
-安装命令和三家实现细节只在安装手册里维护。不要把长期 Roadmap、进度快照或“续跑策略”解释塞进牛马模式 prompt；这里只放执行 AI 能直接照做的停止前检查指令，长期状态仍以 `.boss/` 文档为准。
+安装命令和三家实现细节只在安装手册里维护。不要把长期 Roadmap、进度快照或抽象解释塞进牛马模式 prompt；prompt 只负责唤起 boss 技能和牛马模式，具体行为由执行规程承载，长期状态仍以 `.boss/` 文档为准。
 
 ## 文件模板
 

@@ -4,7 +4,7 @@
 
 ## install-ff-stop-hooks.mjs
 
-把 `.ai/ff.yaml` 牛马模式安装到 Codex、Claude Code、OpenCode。安装细节见 [`../references/stop-hooks-installation.md`](../references/stop-hooks-installation.md)；停止前行为规则见 [`../guides/continuation-policy.md`](../guides/continuation-policy.md)，实际 prompt 写法见 [`../references/stop-hooks.md`](../references/stop-hooks.md)。
+把 `.ai/ff.yaml` 牛马模式安装到 Codex、Claude Code、OpenCode。安装细节见 [`../references/stop-hooks-installation.md`](../references/stop-hooks-installation.md)；执行规程见 [`../guides/ff-execution.md`](../guides/ff-execution.md)，实际 prompt 写法见 [`../references/stop-hooks.md`](../references/stop-hooks.md)。
 
 ```bash
 node tools/install-ff-stop-hooks.mjs

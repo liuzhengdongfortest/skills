@@ -2,7 +2,7 @@
 
 本文件只讲 Codex、Claude Code、OpenCode 的 stop hook 安装和实现细节。
 
-停止前行为规则见 [`../guides/continuation-policy.md`](../guides/continuation-policy.md)，实际 prompt 写法见 [`stop-hooks.md`](stop-hooks.md)。不要把安装细节当作执行指令。
+停止前执行规程见 [`../guides/ff-execution.md`](../guides/ff-execution.md)，实际 prompt 写法见 [`stop-hooks.md`](stop-hooks.md)。不要把安装细节当作执行指令。
 
 ## 底层实现
 

@@ -1,13 +1,6 @@
 enabled: true
 # repeat: 10
 prompt: |
-  Before stopping, inspect the current repository and boss records.
+  Use the boss skill. Follow its 牛马模式执行规程 before stopping.
 
-  If the current task is not finished, finish the next safe step.
-  If the work has not been verified, run the relevant verification.
-  If verification fails, fix the failure and verify again.
-  If `.boss` records are stale, update the relevant task, Roadmap, requirement, or architecture record.
-  If this is a git repository, inspect the worktree. Commit completed work with a focused message, or clearly record why a remaining change is not committed.
-  If there is another safe, verifiable, requirement-anchored next action, continue with it.
-
-  Only stop when the current work is finished, verified, recorded, and either committed or explicitly accounted for. If you cannot continue safely, explain the blocker and the exact state you are leaving behind.
+  Load the relevant boss records, inspect the repository state, then continue any safe, verifiable, requirement-anchored next action. Only stop when the work is finished, verified, recorded, and the git worktree is committed or explicitly accounted for.
