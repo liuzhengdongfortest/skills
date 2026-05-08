@@ -1,63 +1,43 @@
-# 牛马模式
+# 牛马模式执行指令
 
-当老板希望 Codex、Claude Code、OpenCode 在“准备停止”前再看一眼项目约束时，用牛马模式。它服务路径 E 的持续推进：让项目用 `.ai/ff.yaml` 声明一个最终检查 prompt，Agent 到 stop 点时如果开关打开，就把 prompt 注回去继续执行。
+牛马模式的 stop hook 不应该把“续跑策略”解释给执行 AI。
 
-牛马模式是概念名，底层实现仍是 stop hook：Codex/Claude Code 走原生 `Stop` hook，OpenCode 用插件监听 `message.part.updated` 的 stop step 和 `session.idle` 来模拟续一轮。
+它应该直接告诉执行 AI 停止前要做什么：
 
-## 项目开关
+- 检查当前 task / Roadmap / 工作区状态。
+- 没验证就验证。
+- 没记录就更新 `.boss/`。
+- 没提交就提交或说明归属。
+- 还有安全、可验证、需求锚定的下一步就继续做。
+- 不能安全继续时，记录原因后再停。
 
-在项目根或任意父目录放：
+内部设计原则见 [`../guides/continuation-policy.md`](../guides/continuation-policy.md)。安装和三家实现细节见 [`stop-hooks-installation.md`](stop-hooks-installation.md)。
 
-```yaml
-# .ai/ff.yaml
-enabled: true
-repeat: 10
-prompt: |
-  Run final verification before stopping.
-  If anything fails, fix it before reporting done.
+## 推荐 prompt
+
+```text
+Before stopping, inspect the current repository and boss records.
+
+If the current task is not finished, finish the next safe step.
+If the work has not been verified, run the relevant verification.
+If verification fails, fix the failure and verify again.
+If `.boss` records are stale, update the relevant task, Roadmap, requirement, or architecture record.
+If this is a git repository, inspect the worktree. Commit completed work with a focused message, or clearly record why a remaining change is not committed.
+If there is another safe, verifiable, requirement-anchored next action, continue with it.
+
+Only stop when the current work is finished, verified, recorded, and either committed or explicitly accounted for. If you cannot continue safely, explain the blocker and the exact state you are leaving behind.
 ```
 
-规则：
+## 不适合放进 prompt 的内容
 
-- 不存在 `.ai/ff.yaml` 或 `.ai/ff.yml`：正常停止。
-- `enabled: false`：正常停止。
-- `enabled: true` 且 `prompt` 非空：Stop 时继续。
-- 默认只续一次，避免无限循环。
-- `repeat: 10`：最多连续续 10 次，第 11 次 stop 允许停止。
-- `repeat: true`：每次 stop 都触发，适合明确要无限续的场景。
+- 大段需求。
+- Roadmap 进度快照。
+- 具体长期状态。
+- 可以从 `.boss/` 读取的事实。
+- “Continuation Policy”“续跑策略”等抽象解释。
 
-开关别名：`enabled`、`enable`、`active`、`on`、`switch`、`开关`。prompt 别名：`prompt`、`reason`、`message`、`提示`。
+长期状态必须来自 `.boss/requirements/`、`.boss/architecture/`、`.boss/roadmaps/` 和 `.boss/tasks/`。
 
-重复次数也可用独立字段声明，别名：`repeat_count`、`repeat_times`、`repeat_limit`、`max_repeats`、`max_repeat`、`times`、`count`、`次数`、`重复次数`。独立字段优先于 `repeat`；例如 `repeat_count: 10` 和 `repeat: 10` 等价。计数按 session 和 `.ai/ff.yaml` 文件版本隔离，状态保存在 `~/.ai-hooks/ff-stop-state.json`，一天后自动清理。
+## 安装边界
 
-## 三家差异
-
-- Codex：原生 `Stop` hook，返回 `{"decision":"block","reason":"..."}` 阻止停止。需要 `[features] codex_hooks = true`。
-- Claude Code：原生 `Stop` hook，返回同样的 `decision:block` JSON。
-- OpenCode：没有原生 Stop block 协议。用插件监听 `message.part.updated` 中的 `step-finish(reason=stop)`，并兼容监听 `session.idle`，再调用 `client.session.prompt(...)` 追加 prompt，效果是“准备停下时立刻续一轮”。
-
-## 技能素材
-
-- `assets/stop-hooks/ff-stop-hook.mjs`：Codex/Claude/OpenCode 共用判断器。
-- `assets/stop-hooks/opencode-ff-stop-gate.js`：OpenCode 插件。
-- `assets/stop-hooks/ff.yaml`：项目 `.ai/ff.yaml` 模板。
-- `tools/install-ff-stop-hooks.mjs`：安装器，把素材写入用户目录并合并三家配置。
-
-安装：
-
-```bash
-node tools/install-ff-stop-hooks.mjs
-```
-
-安装器会写入：
-
-- `~/.ai-hooks/ff-stop-hook.mjs`
-- `~/.codex/hooks.json`
-- `~/.codex/config.toml`
-- `~/.claude/settings.json`
-- `~/.config/opencode/plugins/ff-stop-gate.js`
-- `~/.config/opencode/opencode.json`
-
-## 使用判断
-
-牛马模式是最后一道检查，不是任务系统本体。适合放“最终验证、修失败、更新 task/Roadmap、不要只汇报状态”的要求；不适合放大段需求、阶段路线图或具体进度快照。路径 E 的长期状态仍然必须来自 `.boss/requirements/`、`.boss/architecture/`、`.boss/roadmaps/` 和 `.boss/tasks/`。
+只有当老板要求安装、更新、排查 stop hook 时，才转到 [`stop-hooks-installation.md`](stop-hooks-installation.md)。

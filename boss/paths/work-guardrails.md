@@ -1,8 +1,8 @@
-# 路径 E Guardrails
+# Work Guardrails
 
-这份文档是路径 E 的护栏。它负责回答“什么不能破坏”，不是替代执行。
+这份文档是 Task 执行和 Roadmap 推进的共同护栏。它负责回答“什么不能破坏”，不是替代执行。
 
-先看 [`e-roadmap-execution.md`](e-roadmap-execution.md) 决定怎么推进，再用这里做自检。不要把本文件改造成每轮审计报告。
+先按目标粒度选择 [Task 执行](task-execution.md) 或 [Roadmap 推进](roadmap-progress.md)，再用这里做自检。不要把本文件改造成每轮审计报告。
 
 ## Roadmap 护栏
 
@@ -62,7 +62,7 @@ requirements 只写：
 
 ## Task 护栏
 
-- task 可以独立存在，不必须挂在 Roadmap 下；小目标直接走 task。
+- task 可以独立存在，不必须挂在 Roadmap 下；小目标直接走 task。Roadmap 派生的 task 可在 frontmatter 保留可选 `roadmap` 回链。
 - 规划阶段只在 Roadmap 里列待执行条目，不批量创建 task 文档。
 - 真正选择某个 Roadmap 条目开工时，才创建 `.boss/tasks/YYYY-MM-DD-描述/task.md`。
 - task 文档创建后，把 Roadmap 中对应条目更新为 task 链接或附上 task 链接。

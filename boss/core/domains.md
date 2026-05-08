@@ -103,9 +103,9 @@ Roadmap 和 task 的分工来自目标粒度。大目标：长期目标 → 阶�
 
 ## tasks：状态式 + 自动归档
 
-task 是文档，不是一行 markdown 待办。Roadmap 只能列待执行条目或索引已创建 task，不能承载 task 本体。
+task 是独立执行文档，不是一行 markdown 待办。task 不默认从属于 Roadmap；Roadmap 可以引用 task，Roadmap 派生的 task 可以在 frontmatter 里保留可选 `roadmap` 回链。
 
-不要在规划阶段批量创建 task 文档。只有当助手真正选择某个 Roadmap 条目开始执行时，才创建对应 `.boss/tasks/YYYY-MM-DD-描述/task.md`，并更新 Roadmap 与 `tasks/INDEX.md`。
+不要在规划阶段批量创建 task 文档。只有当助手真正选择某个具体事项开始执行时，才创建对应 `.boss/tasks/YYYY-MM-DD-描述/task.md`；如果该事项来自 Roadmap，则同时更新 Roadmap 与 `tasks/INDEX.md`。
 
 Roadmap 完成或废弃后移动整个文件到 `.boss/roadmaps/_resolved/YYYY-MM/`，并更新 `.boss/roadmaps/INDEX.md`。active Roadmap 目录只保留仍在推进的路线图。
 

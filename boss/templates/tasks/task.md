@@ -3,7 +3,7 @@ type:
 status: in_progress       # pending | in_progress | completed | blocked
 created: YYYY-MM-DD
 updated: YYYY-MM-DDTHH:mm:ss+08:00
-roadmap:
+roadmap:                 # optional；Roadmap 派生 task 时填写，独立 task 可留空
 ---
 
 # Task：做什么
