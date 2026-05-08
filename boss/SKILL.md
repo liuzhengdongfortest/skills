@@ -168,7 +168,7 @@ Plan 是控制面板，task 是任务文档。
 
 - [Plan 质量](guides/plan-quality.md)：写计划时把产品、工程、设计、验证、交付和风险想全。
 - [执行中发现问题](guides/execution-discovery.md)：执行阶段持续观察，能修则修，不能修则归档或建任务。
-- [工程治理](guides/engineering-governance.md)：结构变坏、临时方案变正式方案、大脚本堆等场景怎么换轨。
+- [工程治理](guides/engineering-governance.md)：结构变坏、临时方案变正式方案、大脚本堆、新业务逻辑放置等场景怎么处理。
 - [工作区清理](guides/worktree-cleanup.md)：每轮 task 结束如何处理 commit、漏文件和残留脏工作区。
 - [信息组织](guides/information-architecture.md)：文档、plan、task、交付物、代码和 UI 都要先建地图，再填细节。
 
