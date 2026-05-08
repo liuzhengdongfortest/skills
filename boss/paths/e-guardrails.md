@@ -2,20 +2,21 @@
 
 这份文档是路径 E 的护栏。它负责回答“什么不能破坏”，不是替代执行。
 
-执行者先看 [`e-plan-execution.md`](e-plan-execution.md) 决定怎么推进，再用这里做自检。不要把本文件改造成每轮审计报告。
+先看 [`e-roadmap-execution.md`](e-roadmap-execution.md) 决定怎么推进，再用这里做自检。不要把本文件改造成每轮审计报告。
 
-## Plan 护栏
+## Roadmap 护栏
 
-- 一个长期目标只保留一个 active 大 plan。
-- active plan 必须写清楚它服务哪些需求故事或用户目标。
-- active plan 不能超过 200 行；超过先压缩再继续。
-- plan 是工作面板，不是历史日志。
-- plan 当前状态必须先粗后细、先分组再列细项；不要把不同能力摊平成一长串干 bullet。
+- 小目标不创建 Roadmap；能在一个 task 内完成和验证的，直接创建/执行 task。
+- 一个长期目标只保留一个 active Roadmap。
+- active Roadmap 必须写清楚它服务哪些需求故事或用户目标。
+- active Roadmap 不能超过 200 行；超过先压缩再继续。
+- Roadmap 是工作面板，不是历史日志。
+- Roadmap 当前状态必须先粗后细、先分组再列细项；不要把不同能力摊平成一长串干 bullet。
 - 当前/最新阶段必须列出一批 planned 条目，让 Agent 下一轮能直接开工。
 - 未来阶段可以写框架，但不要提前细拆大量条目。
 - 阶段可以改，但变化必须能解释为更好地满足需求锚点。
 
-压缩 plan 时保留：
+压缩 Roadmap 时保留：
 
 - frontmatter
 - 目标
@@ -27,7 +28,7 @@
 - 完成标准
 - 最近 3 条以内关键执行记录
 
-压缩 plan 时删除：
+压缩 Roadmap 时删除：
 
 - 已完成 task 明细
 - 过长验证日志
@@ -53,18 +54,19 @@ requirements 只写：
 
 不要写：
 
-- 阶段计划、路线图、排期、task 列表
+- Roadmap、排期、task 列表
 - 技术方案、框架选型、模块拆分、执行步骤
 - 代码路径、具体文件名、内部数据结构
 
-如果用户需求变了，先更新 requirements，再更新 plan/tasks。
+如果用户需求变了，先更新 requirements，再更新 Roadmap/tasks。
 
 ## Task 护栏
 
-- 规划阶段只在 plan 里列待执行条目，不批量创建 task 文档。
-- 真正选择某个 plan 条目开工时，才创建 `.boss/tasks/YYYY-MM-DD-描述/task.md`。
-- task 文档创建后，把 plan 中对应条目更新为 task 链接或附上 task 链接。
-- plan 里的 checkbox 只能是标题、状态摘要或 task 引用，不能承载目标、范围、验收、验证、执行记录。
+- task 可以独立存在，不必须挂在 Roadmap 下；小目标直接走 task。
+- 规划阶段只在 Roadmap 里列待执行条目，不批量创建 task 文档。
+- 真正选择某个 Roadmap 条目开工时，才创建 `.boss/tasks/YYYY-MM-DD-描述/task.md`。
+- task 文档创建后，把 Roadmap 中对应条目更新为 task 链接或附上 task 链接。
+- Roadmap 里的 checkbox 只能是标题、状态摘要或 task 引用，不能承载目标、范围、验收、验证、执行记录。
 - task 执行记录必须用 `YYYY-MM-DDTHH:mm:ss+08:00`；同一秒多条时追加毫秒或序号。
 - `.boss/tasks/INDEX.md` 只放已经创建且仍活跃的 task。
 - task 完成后移动整个目录到 `.boss/tasks/_resolved/YYYY-MM/`。
@@ -76,7 +78,7 @@ task 文档推荐结构：
 status: pending
 created: YYYY-MM-DD
 updated: YYYY-MM-DDTHH:mm:ss+08:00
-plan: ../../plans/xxx.md
+roadmap: ../../roadmaps/xxx.md
 ---
 
 # Task：一句话
@@ -103,8 +105,9 @@ plan: ../../plans/xxx.md
 
 提交前检查：
 
-- 只 stage 本 task 相关代码、测试、文档、plan/task 状态更新和交付物。
-- 不提交用户已有的无关改动。
+- 只 stage 本 task 相关代码、测试、文档、Roadmap/task 状态更新和交付物。
+- 不把无关改动混入本 task commit；可安全归因的无关改动只能单独提交。
+- 不提交用户已有的无关改动或来源不明改动。
 - 不把 `.boss/runtime` 或 `.boss/logs` 混入 task commit，除非 task 明确要求处理运行时日志。
 - 如果不是 git 仓库，或无法安全拆分无关改动，在 task 执行记录里写明 `git commit skipped` 和原因。
 
@@ -140,25 +143,25 @@ plan: ../../plans/xxx.md
 
 汇报阶段完成前检查：
 
-- active plan 不超过 200 行。
+- active Roadmap 不超过 200 行。
 - 阶段切分仍服务需求锚点。
 - 阶段条目全部完成或明确转入后续。
 - 每个完成 task 有验证证据。
 - 每个完成 task 有对应 git commit，或 task 记录里写明跳过原因。
-- `.boss/plans/INDEX.md` 仍只指向正确 active plan。
+- `.boss/roadmaps/INDEX.md` 仍只指向正确 active Roadmap。
 
 阶段完成不是停工理由。阶段完成后拆下一阶段 planned 条目，然后继续推进安全工作。
 
 ## 禁止项
 
-- 禁止为一个长期目标创建一堆 active plan 文件。
+- 禁止为一个长期目标创建一堆 active Roadmap 文件。
 - 禁止未来阶段还没开始就细拆大量 tasks。
 - 禁止把阶段当成锚点，忽略用户需求。
-- 禁止需求缺失或过期时直接执行 plan。
-- 禁止把阶段计划、task 列表、技术路线塞进 requirements。
+- 禁止需求缺失或过期时直接执行 Roadmap。
+- 禁止把 Roadmap、task 列表、技术路线塞进 requirements。
 - 禁止在规划阶段批量预建 task 文档。
-- 禁止把 task 本体写成 active plan 里的一行 markdown 待办。
-- 禁止只用内部 plan，不更新 `.boss/plans`。
+- 禁止把 task 本体写成 active Roadmap 里的一行 markdown 待办。
+- 禁止只用内部 Roadmap，不更新 `.boss/roadmaps`。
 - 禁止事后一次性补账伪装成执行中维护。
 - 禁止完成 task 后不提交也不记录跳过原因。
 - 禁止把无关用户改动混进 task commit。

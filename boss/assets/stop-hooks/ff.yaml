@@ -1,6 +1,6 @@
 enabled: true
 # repeat: 10
 prompt: |
-  Before stopping, reread the active boss plan/task state.
+  Before stopping, reread the active boss Roadmap/task state.
   If there is a safe, verifiable, requirement-anchored next action, continue with it.
-  If current work is complete, run the relevant verification and update task/plan records before reporting done.
+  If current work is complete, run the relevant verification and update task/Roadmap records before reporting done.

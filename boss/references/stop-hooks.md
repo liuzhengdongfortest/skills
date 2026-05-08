@@ -60,4 +60,4 @@ node tools/install-ff-stop-hooks.mjs
 
 ## 使用判断
 
-牛马模式是最后一道检查，不是任务系统本体。适合放“最终验证、修失败、更新 task/plan、不要只汇报状态”的要求；不适合放大段需求、阶段计划或具体进度快照。路径 E 的长期状态仍然必须来自 `.boss/requirements/`、`.boss/architecture/`、`.boss/plans/` 和 `.boss/tasks/`。
+牛马模式是最后一道检查，不是任务系统本体。适合放“最终验证、修失败、更新 task/Roadmap、不要只汇报状态”的要求；不适合放大段需求、阶段路线图或具体进度快照。路径 E 的长期状态仍然必须来自 `.boss/requirements/`、`.boss/architecture/`、`.boss/roadmaps/` 和 `.boss/tasks/`。

@@ -43,12 +43,12 @@ requirements 是用户需求的锚点，不是计划、任务或实现方案的�
 
 不要写：
 
-- 阶段计划、路线图、排期、task 列表
+- Roadmap、排期、task 列表
 - 技术方案、框架选型、模块拆分、执行步骤
 - 代码路径、具体文件名、内部数据结构
 - “先做 A 再做 B”这类推进安排
 
-如果写需求时冒出实现思路：需求文档只保留对用户可感知的约束，把设计细节移到 architecture，把推进安排移到 plans，把可执行事项移到 tasks。
+如果写需求时冒出实现思路：需求文档只保留对用户可感知的约束，把设计细节移到 architecture，把推进安排移到 roadmaps，把可执行事项移到 tasks。
 
 VISION.md 是入口，子文档用用户故事组织。推荐格式：
 
@@ -65,44 +65,49 @@ VISION.md 是入口，子文档用用户故事组织。推荐格式：
 - 索引膨胀就聚类（超过 ~20 条）——AI 主动提议重组，分类从条目中浮现，不预建
 - 重构不丢内容——只移文件 + 更新链接
 
-## plans：目标的框架
+## roadmaps：Roadmap 目标框架
 
-计划和任务之间：目标 → 阶段框架（粗线条）→ 当前阶段待执行条目 → 执行时创建 task 文档。
+Roadmap 和 task 的分工来自目标粒度。大目标：长期目标 → 阶段框架（粗线条）→ 当前阶段待执行条目 → 执行时创建 task 文档。小目标：直接创建/执行 task，不需要 Roadmap。
 
-plans 是工作面板，不是日志仓库。单个 plan 文件硬上限 200 行；超过就必须先压缩，再继续执行或汇报。
+`.boss/roadmaps/` 保存 Roadmap 文档，是长期控制面板，不是日志仓库。单个 Roadmap 文件硬上限 200 行；超过就必须先压缩，再继续执行或汇报。
 
-当前/最新阶段必须在 plan 里先列出初步待执行条目，避免 Agent CLI 启动后只汇报“待拆任务”。这些条目只是 planned 条目，不是 task 文档；真正开工时才创建 `.boss/tasks/.../task.md`。
+当前/最新阶段必须在 Roadmap 里先列出初步待执行条目，避免 Agent CLI 启动后只汇报“待拆任务”。这些条目只是 planned 条目，不是 task 文档；真正开工时才创建 `.boss/tasks/.../task.md`。
 
 ```
-# 计划：一句话
+# Roadmap：一句话
 ## 目标
 要达成的状态
 ## 框架
 阶段 1: ... → 阶段 2: ... → 阶段 3: ...
-## 当前
-在阶段 X，当前 task-XX 进行中
+## 当前地图
+阶段 X：一句话说明当前重点
+- 能力 A：状态摘要
+- 能力 B：状态摘要
+- 风险/缺口：状态摘要
 ## 关联任务
 - [ ] Task A — planned
 - [ ] [Task B](../tasks/YYYY-MM-DD-xxx/task.md) — active
 ```
 
-执行中不断完善。完成标 `status: done`。
+执行中不断完善。状态建议使用 `active`、`historical`、`completed`。
 
 压缩规则：
 
-- 保留：目标、需求锚点、计划原则、当前阶段、当前阶段 tasks、完成标准、最近关键执行记录
+- 保留：目标、需求锚点、计划原则、当前阶段、按能力分组的当前地图、当前阶段 tasks、完成标准、最近关键执行记录
 - 合并：过时阶段、已完成 task、重复观察、长日志
 - 删除：旧执行记录和流水账；具体干了什么由 tasks 目录自然承载
-- 转移：只有长期有价值、但不属于当前 plan 的决策，才移到 wiki、architecture 或对应 task
+- 转移：只有长期有价值、但不属于当前 Roadmap 的决策，才移到 wiki、architecture 或对应 task
 - 压缩后只保留当前状态，不必为旧执行记录留 history 链接
 
 压缩不是改需求；如果压缩时发现目标或需求锚点变了，先回 requirements。
 
 ## tasks：状态式 + 自动归档
 
-task 是文档，不是一行 markdown 待办。plan 只能列待执行条目或索引已创建 task，不能承载 task 本体。
+task 是文档，不是一行 markdown 待办。Roadmap 只能列待执行条目或索引已创建 task，不能承载 task 本体。
 
-不要在规划阶段批量创建 task 文档。只有当助手真正选择某个 plan 条目开始执行时，才创建对应 `.boss/tasks/YYYY-MM-DD-描述/task.md`，并更新 plan 与 `tasks/INDEX.md`。
+不要在规划阶段批量创建 task 文档。只有当助手真正选择某个 Roadmap 条目开始执行时，才创建对应 `.boss/tasks/YYYY-MM-DD-描述/task.md`，并更新 Roadmap 与 `tasks/INDEX.md`。
+
+Roadmap 完成或废弃后移动整个文件到 `.boss/roadmaps/_resolved/YYYY-MM/`，并更新 `.boss/roadmaps/INDEX.md`。active Roadmap 目录只保留仍在推进的路线图。
 
 task type 自由字段，不预枚举。大部分只要 `task.md`，需更多文件时才加（sync 带 migration.md + proposals/，research 带 notes.md）。
 

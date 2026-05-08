@@ -1,9 +1,9 @@
 ---
-status: active            # active | done
+status: active            # active | historical | completed
 created: YYYY-MM-DD
 ---
 
-# 计划：一句话
+# Roadmap：一句话
 
 ## 目标
 
@@ -17,9 +17,16 @@ created: YYYY-MM-DD
 阶段 2: ...
 阶段 3: ...
 
-## 当前
+## 当前地图
 
-（在哪个阶段，哪些条目 planned/active/blocked）
+（先粗后细：一句话说明当前阶段，再按能力/子系统/风险分组写状态摘要）
+
+阶段 X：当前重点是 ...
+
+- 能力/子系统 A：状态摘要
+- 能力/子系统 B：状态摘要
+- 验证/交付：状态摘要
+- 风险/缺口：状态摘要
 
 ## 当前阶段条目
 
@@ -28,3 +35,7 @@ created: YYYY-MM-DD
 - [ ] Task 1：一句话待执行条目 — planned
 - [ ] Task 2：一句话待执行条目 — planned
 - [ ] Task 3：一句话待执行条目 — planned
+
+## 完成标准
+
+（什么证据说明这个 Roadmap 或当前阶段完成）
