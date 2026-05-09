@@ -8,7 +8,7 @@
 
 牛马模式底层实现是 stop hook：
 
-- Codex：原生 `Stop` hook，返回 `{"decision":"block","reason":"..."}` 阻止停止。需要 `[features] codex_hooks = true`。
+- Codex：原生 `Stop` hook，返回 `{"decision":"block","reason":"..."}` 阻止停止。需要 `--enable hooks` 或 `[features] hooks = true`。旧字段 `codex_hooks` 已废弃，会触发 deprecated 警告。
 - Claude Code：原生 `Stop` hook，返回同样的 `decision:block` JSON。
 - OpenCode：没有原生 Stop block 协议。用插件监听 `message.part.updated` 中的 `step-finish(reason=stop)`，并兼容监听 `session.idle`，再调用 `client.session.prompt(...)` 追加 prompt。
 

@@ -68,21 +68,21 @@ function ensureCodexFeature(configPath) {
     for (let i = 0; i < lines.length; i += 1) {
       const line = lines[i];
       if (/^\s*\[.+\]\s*$/.test(line)) inFeatures = /^\s*\[features\]\s*$/.test(line);
-      if (inFeatures && /^\s*codex_hooks\s*=/.test(line)) {
-        lines[i] = "codex_hooks = true";
+      if (inFeatures && /^\s*(codex_hooks|hooks)\s*=/.test(line)) {
+        lines[i] = "hooks = true";
         found = true;
       }
       if (inFeatures && i + 1 < lines.length && /^\s*\[.+\]\s*$/.test(lines[i + 1]) && !found) {
-        lines.splice(i + 1, 0, "codex_hooks = true");
+        lines.splice(i + 1, 0, "hooks = true");
         found = true;
         break;
       }
     }
 
-    if (!found) lines.push("codex_hooks = true");
+    if (!found) lines.push("hooks = true");
     text = lines.join("\n");
   } else {
-    text = `${text.trimEnd()}\n\n[features]\ncodex_hooks = true\n`;
+    text = `${text.trimEnd()}\n\n[features]\nhooks = true\n`;
   }
 
   fs.writeFileSync(configPath, text.endsWith("\n") ? text : `${text}\n`, "utf8");
