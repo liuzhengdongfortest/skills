@@ -8,9 +8,11 @@ roadmap:                 # optional；Roadmap 派生 task 时填写，独立 tas
 
 # Task：做什么
 
+task 是有规划、有思想、有深度的工作单元。它至少包含多个关联步骤，交付可感知的工程或产品价值。如果一个编辑动作就能完成的东西，不单独成为一个 task——它是某个 task 内的一个步骤。
+
 ## 目标
 
-（一句话说明本 task 要达成什么状态）
+（本 task 要达成什么可感知的状态？不是一个文件操作，而是一个用户或开发者能感受到的变化。反例："拆出 tui-diff-rendering.mjs"；正例："降低 ui.mjs 的渲染职责，让 TUI 渲染相关模块各自独立"）
 
 ## 需求锚点
 
@@ -18,11 +20,11 @@ roadmap:                 # optional；Roadmap 派生 task 时填写，独立 tas
 
 ## 范围
 
-（本 task 做什么、不做什么）
+（本 task 做什么、不做什么。范围描述的是能力和边界，不是文件列表）
 
 ## 执行方案
 
-（这个 task 准备怎么做；这是局部执行方案，不是 `.boss/roadmaps/` Roadmap）
+（这个 task 准备怎么做；至少多个步骤，写清楚先后顺序和为什么。如果只能写一步，说明本 task 体量不够，应该合并到更大的 task 里）
 
 ## 验收
 
@@ -46,10 +48,10 @@ roadmap:                 # optional；Roadmap 派生 task 时填写，独立 tas
 
 ## Git
 
-完成并验证通过后提交一次小 commit，只包含本 task 相关改动。收尾必须运行 `git status --short --untracked-files=all`；剩余改动要有归属、有原因、有下一步。
+完成并验证通过后提交。一个 task 可以对应一个或多个 commit，但 commit 只是 task 的交付载体，不是 task 的边界定义。收尾必须运行 `git status --short --untracked-files=all`；剩余改动要有归属、有原因、有下一步。
 
 ## 执行记录
 
-- YYYY-MM-DDTHH:mm:ss+08:00：执行过程中的关键节点。
+- YYYY-MM-DDTHH:mm:ss+08:00：执行过程中的关键节点。同一个 task 的不同步骤应该有不同的时间戳，不能全部相同。
 
 记录必须带可排序时间戳，不能只写日期；同一秒多条时追加毫秒或序号，如 `2026-05-07T18:42:13.001+08:00`。
