@@ -184,8 +184,8 @@ Roadmap 是大目标的长期控制面板，用来先暴露阶段地图，再逐
 
 高频实践指南：
 
-- [Roadmap 质量](guides/roadmap-quality.md)：写长期路线图时把产品、工程、设计、验证、交付和风险想全。
-- [牛马模式执行规程](guides/ff-execution.md)：stop hook 触发时执行 AI 要读的停止前检查和继续执行规则。
+- [Roadmap 质量](guides/roadmap-quality.md)：写长期路线图不只是拆功能——要注入 AI 的参谋判断，覆盖产品/工程/设计/数据/验证/运维/风险，阶段完成后做需求与质量回顾。
+- [牛马模式执行规程](guides/ff-execution.md)：停止前硬约束（代码质量、工程质量、渐进式披露、遇阻深挖、先抄后造、精益求精），看得更多（向内/向外/精益/用眼/往深/回头/元层面），做得更多（视觉整饬、前瞻性探索）。
 - [执行中发现问题](guides/execution-discovery.md)：执行阶段持续观察，能修则修，不能修则归档或建任务。
 - [工程治理](guides/engineering-governance.md)：结构变坏、临时方案变正式方案、大脚本堆、新业务逻辑放置等场景怎么处理。
 - [工作区清理](guides/worktree-cleanup.md)：每轮 task 结束如何处理 commit、漏文件和残留脏工作区。

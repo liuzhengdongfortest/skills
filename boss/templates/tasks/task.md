@@ -38,6 +38,12 @@ roadmap:                 # optional；Roadmap 派生 task 时填写，独立 tas
 - 待处理：
 - 需老板拍板：
 
+## 可改进点
+
+（硬约束：每个 task 收尾必须产出一个"还可以更好"的想法，哪怕本轮不修。需求文档是下限不是上限。）
+
+- 本轮觉得还可以更好的地方：
+
 ## Git
 
 完成并验证通过后提交一次小 commit，只包含本 task 相关改动。收尾必须运行 `git status --short --untracked-files=all`；剩余改动要有归属、有原因、有下一步。

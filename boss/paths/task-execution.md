@@ -4,7 +4,7 @@ Task 执行用于小目标：目标清楚、范围有限、能在一次执行闭
 
 Task 是独立工作方法，不默认知道 Roadmap。Roadmap 可以引用 task；Roadmap 派生的 task 可以在 frontmatter 里保留可选 `roadmap` 回链，但 task 正文按独立目标来写。
 
-本路径遵守[路径共同原则](shared-principles.md)，并遵守 [work guardrails](work-guardrails.md)。
+本路径遵守[路径共同原则](shared-principles.md)，并遵守 [work guardrails](work-guardrails.md)。若处于牛马模式，额外遵守 [牛马模式硬约束](../guides/ff-execution.md#硬约束)（工程质量、渐进式披露、遇阻深挖、先抄后造、精益求精等）。
 
 ## 进入判断
 
