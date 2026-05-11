@@ -19,6 +19,10 @@
 ```yaml
 # .ai/ff.yaml
 enabled: true
+# 按 CLI 分别控制（可选，未设置时回退到 enabled）：
+# codex: true
+# claude: true
+# opencode: true
 repeat: 10
 prompt: |
   Run final verification before stopping.
@@ -28,13 +32,17 @@ prompt: |
 规则：
 
 - 不存在 `.ai/ff.yaml` 或 `.ai/ff.yml`：正常停止。
-- `enabled: false`：正常停止。
+- `enabled: false`：所有 CLI 正常停止。
 - `enabled: true` 且 `prompt` 非空：Stop 时继续。
+- `codex` / `claude` / `opencode`：单独控制某个 CLI 的启停，优先级高于 `enabled`。未设置时回退到 `enabled` 的值。
+  - 例如 `enabled: true` + `codex: false` → Codex 停止时不触发，Claude/OpenCode 正常触发。
 - 默认只续一次，避免无限循环。
 - `repeat: 10`：最多连续续 10 次，第 11 次 stop 允许停止。
 - `repeat: true`：每次 stop 都触发，适合明确要无限续的场景。
 
 开关别名：`enabled`、`enable`、`active`、`on`、`switch`、`开关`。
+
+CLI 开关别名：`codex` / `codex_enabled` / `codex_enable`；`claude` / `claude_enabled` / `claude_enable`；`opencode` / `opencode_enabled` / `opencode_enable`。
 
 prompt 别名：`prompt`、`reason`、`message`、`提示`。
 

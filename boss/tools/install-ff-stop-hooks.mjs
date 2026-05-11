@@ -91,17 +91,18 @@ function ensureCodexFeature(configPath) {
 const hookScript = path.join(home, ".ai-hooks", "ff-stop-hook.mjs");
 copyAsset("ff-stop-hook.mjs", hookScript);
 
-const command = commandFor(hookScript);
+const commandCodex = `${commandFor(hookScript)} --codex`;
+const commandClaude = `${commandFor(hookScript)} --claude`;
 
 const codexHooksPath = path.join(home, ".codex", "hooks.json");
 const codexHooks = readJson(codexHooksPath, { hooks: {} });
-ensureHookCommand(codexHooks, "Stop", command, { statusMessage: "Checking 牛马模式" });
+ensureHookCommand(codexHooks, "Stop", commandCodex, { statusMessage: "Checking 牛马模式" });
 writeJson(codexHooksPath, codexHooks);
 ensureCodexFeature(path.join(home, ".codex", "config.toml"));
 
 const claudeSettingsPath = path.join(home, ".claude", "settings.json");
 const claudeSettings = readJson(claudeSettingsPath, {});
-ensureHookCommand(claudeSettings, "Stop", command);
+ensureHookCommand(claudeSettings, "Stop", commandClaude);
 writeJson(claudeSettingsPath, claudeSettings);
 
 const opencodePluginPath = path.join(home, ".config", "opencode", "plugins", "ff-stop-gate.js");

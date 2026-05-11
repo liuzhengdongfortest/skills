@@ -1,4 +1,8 @@
 enabled: true
+# 按 CLI 分别控制（可选，未设置时回退到 enabled）：
+# codex: true
+# claude: true
+# opencode: true
 # repeat: 10
 prompt: |
   Use the boss skill. Follow its 牛马模式执行规程 before stopping.

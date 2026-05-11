@@ -33,6 +33,11 @@ const KEYS = {
     "transcript_path",
     "transcriptPath",
   ],
+  cli_enable: {
+    codex: ["codex", "codex_enabled", "codex_enable"],
+    claude: ["claude", "claude_enabled", "claude_enable"],
+    opencode: ["opencode", "opencode_enabled", "opencode_enable"],
+  },
 };
 
 const hasOwn = (object, key) => Object.prototype.hasOwnProperty.call(object, key);
@@ -256,7 +261,22 @@ function continueCount(input, file, maxContinues) {
   return { action: "continue", maxContinues, count, remaining: maxContinues - count };
 }
 
-function evaluate(input) {
+function detectCli() {
+  if (process.argv.includes("--codex")) return "codex";
+  if (process.argv.includes("--claude")) return "claude";
+  if (process.argv.includes("--opencode")) return "opencode";
+  return null;
+}
+
+function isEnabled(config, cli) {
+  if (cli && KEYS.cli_enable[cli]) {
+    const perCli = pick(config, KEYS.cli_enable[cli]);
+    if (perCli !== undefined) return asBool(perCli);
+  }
+  return asBool(pick(config, KEYS.enable));
+}
+
+function evaluate(input, cli) {
   const cwd = input.cwd || input.project_dir || input.directory || process.cwd();
   const file = findConfig(cwd);
   if (!file) return { action: "allow", file: null };
@@ -269,7 +289,7 @@ function evaluate(input) {
   }
 
   const prompt = String(pick(config, KEYS.prompt) ?? "").trim();
-  if (!asBool(pick(config, KEYS.enable)) || !prompt) return { action: "allow", file };
+  if (!isEnabled(config, cli) || !prompt) return { action: "allow", file };
 
   return {
     ...continueCount(input, file, repeatLimit(config)),
@@ -279,7 +299,8 @@ function evaluate(input) {
 }
 
 const input = parseJson(await readStdin());
-const result = evaluate(input);
+const cli = detectCli();
+const result = evaluate(input, cli);
 
 if (process.argv.includes("--opencode")) {
   process.stdout.write(JSON.stringify(result));
