@@ -9,7 +9,7 @@
 1. 在 `.boss/meetings/` 下创建 `YYYY-MM-DD-主题/` 目录
 2. 生成 notes.md / decisions.md。需要推进的事项不在此列——大方向关联到 roadmaps/，具体任务由老板触发创建 tasks/
 3. 展示确认后落盘
-4. 记的是原始讨论素材，不是正式文档
+4. 记的是原始讨论素材，不是正式文档。**历史会议只读**——已落盘的 meeting 内容不允许回改。如果后续讨论推翻了旧结论，在新 meeting 里记录"推翻了 YYYY-MM-DD 的 XX 结论"并更新受影响的 architecture/requirements/roadmaps，不动旧 meeting 文件
 
 ## 落需求
 
