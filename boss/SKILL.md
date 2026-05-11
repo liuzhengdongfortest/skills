@@ -190,8 +190,9 @@ Roadmap 是大目标的长期控制面板，用来先暴露阶段地图，再逐
 - [工程治理](guides/engineering-governance.md)：结构变坏、临时方案变正式方案、大脚本堆、新业务逻辑放置等场景怎么处理。
 - [工作区清理](guides/worktree-cleanup.md)：每轮 task 结束如何处理 commit、漏文件和残留脏工作区。
 - [信息组织](guides/information-architecture.md)：文档、Roadmap、task、交付物、代码和 UI 都要先建地图，再填细节。
+- [工程巡检方法论](guides/engineering-inspection.md)：空转时怎么从架构对齐、模块巡检、模式审计、硬指标、模式提炼、文档完整性六个方向侦查项目，产出有优先级的发现清单。
 - [竞品借鉴评审](guides/competitive-review.md)：参考竞品时用独立评审人视角判断，不能只做表象。
-- [术语指南](guides/terminology.md)：区分 Roadmap、task 执行方案和日常语言里的“计划”。
+- [术语指南](guides/terminology.md)：区分 Roadmap、task 执行方案和日常语言里的”计划”。
 
 操作和规则入口：
 
