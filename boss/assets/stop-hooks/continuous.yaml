@@ -1,0 +1,10 @@
+enabled: true
+# 按 CLI 分别控制（可选，未设置时回退到 enabled）：
+# codex: true
+# claude: true
+# opencode: true
+# repeat: 10
+prompt: |
+  Use the boss skill. Follow its 持续工作模式执行规程 before stopping.
+
+  Start with a 大抬头 (top-down recalibration of the project). Load the relevant boss records, inspect the repository state, then continue any safe, verifiable, requirement-anchored next action. Only stop when the work is finished, verified, recorded, and the git worktree is committed or explicitly accounted for.

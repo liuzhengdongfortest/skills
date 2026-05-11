@@ -6,7 +6,7 @@ import path from "node:path";
 
 const TRUE_VALUES = new Set(["1", "true", "yes", "on", "y", "enabled", "enable"]);
 const FALSE_VALUES = new Set(["0", "false", "no", "off", "n", "disabled", "disable"]);
-const CONFIG_FILES = ["ff.yaml", "ff.yml"];
+const CONFIG_FILES = ["continuous.yaml", "continuous.yml"];
 const STATE_TTL_MS = 24 * 60 * 60 * 1000;
 
 const KEYS = {
@@ -42,7 +42,7 @@ const KEYS = {
 
 const hasOwn = (object, key) => Object.prototype.hasOwnProperty.call(object, key);
 const indentation = (line) => line.length - line.trimStart().length;
-const stateFilePath = () => process.env.FF_STOP_HOOK_STATE || path.join(os.homedir(), ".ai-hooks", "ff-stop-state.json");
+const stateFilePath = () => process.env.STOP_HOOK_STATE || path.join(os.homedir(), ".ai-hooks", "stop-state.json");
 
 function readStdin() {
   return new Promise((resolve) => {

@@ -3,7 +3,7 @@ import path from "node:path";
 import { spawn } from "node:child_process";
 
 const HOOK_SCRIPT =
-  process.env.FF_STOP_HOOK_SCRIPT || path.join(os.homedir(), ".ai-hooks", "ff-stop-hook.mjs");
+  process.env.STOP_HOOK_SCRIPT || path.join(os.homedir(), ".ai-hooks", "stop-hook.mjs");
 
 function runHook(payload) {
   return new Promise((resolve) => {
@@ -30,7 +30,7 @@ function runHook(payload) {
   });
 }
 
-export const FFStopGate = async ({ client, directory, worktree }) => {
+export const StopGate = async ({ client, directory, worktree }) => {
   const inFlight = new Set();
   const lastContinuedAt = new Map();
   const duplicateWindowMs = 250;

@@ -4,7 +4,7 @@ Roadmap 推进用于大目标：跨阶段、跨多轮、需要状态地图和渐
 
 Roadmap 是组织方法，不是执行方法。具体工作落到独立 task；Roadmap 只负责维护大目标地图、选择下一步、引用 task、吸收结果。
 
-本路径遵守[路径共同原则](shared-principles.md)，并遵守 [work guardrails](work-guardrails.md)。若处于牛马模式，额外遵守 [牛马模式硬约束](../guides/ff-execution.md#硬约束)。
+本路径遵守[路径共同原则](shared-principles.md)，并遵守 [work guardrails](work-guardrails.md)。节拍按 [抬头节拍](../guides/lookup-beats.md) 走：每个 task 完成做中抬头，每个 Roadmap 条目完成做大抬头。若处于持续工作模式，额外遵守 [持续工作模式硬约束](../guides/continuous-work.md#硬约束)。
 
 ## 进入判断
 
@@ -49,17 +49,18 @@ Roadmap 不写 task 本体，不写执行流水，不承载具体实现记录。
 3. 选择下一个最小可验证 Roadmap 条目。
 4. 如果条目只是地图修正、状态压缩、文档同步，可直接更新 Roadmap 并验证。
 5. 如果条目需要执行具体工作，创建独立 task，task 可在 frontmatter 写可选 `roadmap` 回链；Roadmap 引用该 task。
-6. 具体执行交给 [Task 执行](task-execution.md)。
-7. task 完成后，Roadmap 吸收结果：更新状态摘要、task 链接、风险和下一步。
-8. 阶段完成后，执行需求与质量回顾（见下方），写阶段总结，拆下一阶段 planned 条目。
-9. 全部阶段完成后，执行最后一次需求与质量回顾，把残留的不舒服条目转为 task 或新建 Roadmap。
-10. Roadmap 完成或废弃后，移动到 `.boss/roadmaps/_resolved/YYYY-MM/`，更新 `.boss/roadmaps/INDEX.md`。
+6. 具体执行交给 [Task 执行](task-execution.md)，task 内部按 [抬头节拍](../guides/lookup-beats.md) 走小抬头/中抬头。
+7. **中抬头**：task 完成后吸收结果——更新对应条目状态摘要、task 链接、风险和下一步。这就是 [抬头节拍](../guides/lookup-beats.md#三级节拍) 里的中抬头在 Roadmap 上的落点；不新增段，刷新工作面板本身就是抬头的产物。
+8. **大抬头**：每完成一个 Roadmap 条目，按 [抬头节拍 - 大抬头扫描](../guides/lookup-beats.md#大抬头扫描) 做一次：从上到下扫 PROFILE → requirements → Roadmap → architecture → tasks INDEX（自适应深度，地图优先+三视角疑点钻），刷新 active Roadmap 的当前状态、阶段、风险、下一步，给客户按 5 行简报格式输出（见下"大抬头客户简报"）。
+9. 阶段完成后，执行阶段大抬头（见下方），写阶段总结，拆下一阶段 planned 条目。
+10. 全部阶段完成后，执行最后一次阶段大抬头，把残留的不舒服条目转为 task 或新建 Roadmap。
+11. Roadmap 完成或废弃后，移动到 `.boss/roadmaps/_resolved/YYYY-MM/`，更新 `.boss/roadmaps/INDEX.md`。
 
-## 需求与质量回顾
+## 阶段大抬头
 
-阶段完成或全部完成后，不是写总结就过了——必须从原始需求出发重新审视已交付的东西。
+阶段完成或全部完成后，做一次更重的大抬头——叫"阶段大抬头"是为了和单个 Roadmap 条目完成后的常规大抬头区分。常规大抬头看"上一个条目带来什么变化"，阶段大抬头从原始需求出发重新审视整个阶段交付的东西。
 
-回顾不依赖记忆：重新打开需求文档，并排对照当前实际行为。
+阶段大抬头不依赖记忆：重新打开需求文档，并排对照当前实际行为。
 
 ### 检查角度
 
@@ -72,7 +73,7 @@ Roadmap 不写 task 本体，不写执行流水，不承载具体实现记录。
 
 把不舒服的点全列出来，按"影响用户完成任务"排优先级。高优先级条目直接转入 Roadmap 下一阶段 planned，或创建独立 task。
 
-在 Roadmap 模板的"需求与质量回顾"区域记录本轮发现和转入 planned 的条目。
+在 Roadmap 模板的"阶段大抬头"区域记录本轮发现和转入 planned 的条目。
 
 ## 遇阻
 
@@ -83,11 +84,19 @@ Roadmap 不写 task 本体，不写执行流水，不承载具体实现记录。
 - 当前 Roadmap 所有条目都已阻塞：不能反复报告同一个阻塞然后停摆。标记 Roadmap 阻塞状态，扫描其他 active Roadmap、工程债条目、文档偏差、`.boss/` 规范收敛，选择最近、最安全、最有价值的可推进事项继续执行。
 - Roadmap 本身不再服务需求：回到 requirements/architecture 讨论，不继续机械推进。
 
-## 汇报
+## 大抬头客户简报
 
-Roadmap 汇报讲地图变化，不讲 task 流水：
+大抬头时给客户的简报固定 5 行结构（前 3 行固定，后 2 行视情况省略）：
 
-- 当前阶段在哪里。
-- 哪些能力推进了。
-- 哪些 task 完成或阻塞。
-- 风险和下一步是什么。
+```
+[本轮大抬头]
+- 上一段完成：X
+- 现状判断：Y（PM/工程/全局任一视角有疑点就写一行）
+- 下一步：Z
+- 调整：W（触发线 2 启动时写出调整方案+推荐；否则省略）
+- 需要拍板：V（触发线 1 或方向级决策；否则省略）
+```
+
+固定结构避免每次自由发挥写得忽长忽短。Roadmap 汇报讲地图变化，不讲 task 流水——5 行结构里的"上一段完成 / 现状判断 / 下一步"自然落在地图层。
+
+中抬头不给客户简报（每个 task 完成都汇报会过于啰嗦），留痕到文档即可；客户需要时看 Roadmap 和 task 文档。完整方法论见 [抬头节拍 - 留痕格式](../guides/lookup-beats.md#留痕格式)。

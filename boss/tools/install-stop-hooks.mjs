@@ -88,15 +88,15 @@ function ensureCodexFeature(configPath) {
   fs.writeFileSync(configPath, text.endsWith("\n") ? text : `${text}\n`, "utf8");
 }
 
-const hookScript = path.join(home, ".ai-hooks", "ff-stop-hook.mjs");
-copyAsset("ff-stop-hook.mjs", hookScript);
+const hookScript = path.join(home, ".ai-hooks", "stop-hook.mjs");
+copyAsset("stop-hook.mjs", hookScript);
 
 const commandCodex = `${commandFor(hookScript)} --codex`;
 const commandClaude = `${commandFor(hookScript)} --claude`;
 
 const codexHooksPath = path.join(home, ".codex", "hooks.json");
 const codexHooks = readJson(codexHooksPath, { hooks: {} });
-ensureHookCommand(codexHooks, "Stop", commandCodex, { statusMessage: "Checking 牛马模式" });
+ensureHookCommand(codexHooks, "Stop", commandCodex, { statusMessage: "Checking 持续工作模式" });
 writeJson(codexHooksPath, codexHooks);
 ensureCodexFeature(path.join(home, ".codex", "config.toml"));
 
@@ -105,8 +105,8 @@ const claudeSettings = readJson(claudeSettingsPath, {});
 ensureHookCommand(claudeSettings, "Stop", commandClaude);
 writeJson(claudeSettingsPath, claudeSettings);
 
-const opencodePluginPath = path.join(home, ".config", "opencode", "plugins", "ff-stop-gate.js");
-copyAsset("opencode-ff-stop-gate.js", opencodePluginPath);
+const opencodePluginPath = path.join(home, ".config", "opencode", "plugins", "stop-gate.js");
+copyAsset("opencode-stop-gate.js", opencodePluginPath);
 
 const opencodeConfigPath = path.join(home, ".config", "opencode", "opencode.json");
 const opencodeConfig = readJson(opencodeConfigPath, {
@@ -118,5 +118,6 @@ const pluginUrl = pathToFileURL(opencodePluginPath).href;
 if (!opencodeConfig.plugin.includes(pluginUrl)) opencodeConfig.plugin.push(pluginUrl);
 writeJson(opencodeConfigPath, opencodeConfig);
 
-console.log("Installed 牛马模式 for Codex, Claude Code, and OpenCode.");
+console.log("Installed 持续工作模式 for Codex, Claude Code, and OpenCode.");
 console.log(`Hook runner: ${hookScript}`);
+console.log(`Project switch template: assets/stop-hooks/continuous.yaml → copy to <project>/.ai/continuous.yaml`);

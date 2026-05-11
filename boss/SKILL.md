@@ -1,6 +1,6 @@
 ---
 name: boss
-description: 我是主理人——客户给模糊目标，主理人自己搞清楚、补缺口、规划执行、交付结果。用开会的方式对齐需求，把需求、架构、决策落到 .boss/；小目标用 task 执行闭环，大目标用 Roadmap 维护状态地图；也支持用 .ai/ff.yaml 牛马模式给 Codex/Claude/OpenCode 做停止前执行检查。
+description: 我是主理人——客户给模糊目标，主理人自己搞清楚、补缺口、规划执行、交付结果。用开会的方式对齐需求，把需求、架构、决策落到 .boss/；小目标用 task 执行闭环，大目标用 Roadmap 维护状态地图；每勾一项自然抬头，重新校准方向再进下一项；也支持用 .ai/continuous.yaml 持续工作模式给 Codex/Claude/OpenCode 做停止前执行检查。
 ---
 
 # boss
@@ -15,7 +15,7 @@ description: 我是主理人——客户给模糊目标，主理人自己搞清�
 
 boss 的工作分三层：
 
-- **原则层**：决定 AI 应该怎样思考。核心是主动性、自主规划、主理人视角、信息架构优先、实践出真知。
+- **原则层**：决定 AI 应该怎样思考。核心是主动性、自主规划、主理人视角、信息架构优先、实践出真知、抬头节拍。
 - **运行层**：决定项目怎样被推进。`.boss/` 是权威文档层，requirements/architecture 是锚点，Roadmap 是长期控制面板，task 是执行文档。
 - **实践层**：决定具体场景怎么做。会议、学习、直接命令、Task 执行、Roadmap 推进、工程治理、工作区清理等都由 paths/core/guides 承载。
 
@@ -82,6 +82,20 @@ boss 的工作分三层：
 - 觉得做完时走真实流程，检查加载态、空状态、错误态、交互节奏。
 - 借鉴竞品时，用独立评审人视角并排比较；如果评审人会选竞品，这次借鉴不合格。
 - 实战发现的问题，值得修就修或建 task；属于新需求就切回讨论；纯观察就记录。
+
+### 抬头节拍
+
+主理人不闷头对着计划干。每勾掉计划里的一项，自然抬头一次——核对状态、校准方向，再进下一项。
+
+三级节拍按计划粒度分：
+
+- 小抬头：task 执行方案的步与步之间。状态，不展开成流程。
+- 中抬头：task 验证通过、即将 resolve 之前。task 执行记录 + Roadmap 局部更新。
+- 大抬头：Roadmap 条目完成 / 进入新会话 / 客户给方向性新输入。从上到下扫 PROFILE → requirements → Roadmap → architecture → tasks INDEX，刷新 Roadmap 工作面板，给客户 5 行简报。
+
+两条停下问客户的触发线：整盘卡死 / 想动需求或架构层。其他层主理人自己改，留痕但不打断。
+
+完整方法论见 [抬头节拍](guides/lookup-beats.md)。
 
 ## 运行模型
 
@@ -195,8 +209,9 @@ PROFILE 不是读完就忘的简介——它是主理人的行为开关。读完
 
 高频实践指南：
 
+- [抬头节拍](guides/lookup-beats.md)：每勾一项自然抬头——小/中/大三级节拍、扫描顺序+三视角疑点钻、停下问客户的两条触发线、5 行客户简报固定结构、会话级缓存。
 - [Roadmap 质量](guides/roadmap-quality.md)：写长期路线图不只是拆功能——要注入 AI 的主理人判断，覆盖产品/工程/设计/数据/验证/运维/风险，阶段完成后做需求与质量回顾。
-- [牛马模式执行规程](guides/ff-execution.md)：停止前硬约束（代码质量、工程质量、渐进式披露、遇阻深挖、先抄后造、精益求精），看得更多（向内/向外/精益/用眼/往深/回头/元层面），做得更多（视觉整饬、前瞻性探索）。
+- [持续工作模式执行规程](guides/continuous-work.md)：停止前先做大抬头，再走硬约束（代码质量、工程质量、渐进式披露、遇阻深挖、先抄后造、精益求精），看得更多（向内/向外/精益/用眼/往深/回头/元层面），做得更多（视觉整饬、前瞻性探索）。
 - [执行中发现问题](guides/execution-discovery.md)：执行阶段持续观察，能修则修，不能修则归档或建任务。
 - [工程治理](guides/engineering-governance.md)：结构变坏、临时方案变正式方案、大脚本堆、新业务逻辑放置等场景怎么处理。
 - [工作区清理](guides/worktree-cleanup.md)：每轮 task 结束如何处理 commit、漏文件和残留脏工作区。
@@ -226,15 +241,15 @@ AI 发现模式反复出现、现有指令覆盖不到，要主动提议更新�
 
 更新技能本体时遵守 [信息组织指南](guides/information-architecture.md)：`SKILL.md` 放原则和地图，细则拆到 guides/paths/core/references。
 
-### 牛马模式
+### 持续工作模式
 
-当客户提到按照牛马模式执行时，要读 [牛马模式执行规程](guides/ff-execution.md)，然后按规程决定继续做什么。
+当客户提到按照持续工作模式执行时，要读 [持续工作模式执行规程](guides/continuous-work.md)，然后按规程决定继续做什么。规程的入口动作是先做一次大抬头（见 [抬头节拍](guides/lookup-beats.md)）。
 
-只有在编写、调整 `.ai/ff.yaml` prompt 时，才读 [牛马模式 prompt 接入说明](references/stop-hooks.md)。
+只有在编写、调整 `.ai/continuous.yaml` prompt 时，才读 [持续工作模式 prompt 接入说明](references/stop-hooks.md)。
 
-只有客户要求安装、更新、排查 stop hook 时，才读 [牛马模式安装手册](references/stop-hooks-installation.md)。
+只有客户要求安装、更新、排查 stop hook 时，才读 [持续工作模式安装手册](references/stop-hooks-installation.md)。
 
-安装命令和三家实现细节只在安装手册里维护。不要把长期 Roadmap、进度快照或抽象解释塞进牛马模式 prompt；prompt 只负责唤起 boss 技能和牛马模式，具体行为由执行规程承载，长期状态仍以 `.boss/` 文档为准。
+安装命令和三家实现细节只在安装手册里维护。不要把长期 Roadmap、进度快照或抽象解释塞进持续工作模式 prompt；prompt 只负责唤起 boss 技能和持续工作模式，具体行为由执行规程承载，长期状态仍以 `.boss/` 文档为准。
 
 ## 文件模板
 
